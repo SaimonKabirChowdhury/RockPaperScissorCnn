@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>درب – Darb</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&family=Tajawal:wght@400;500;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --emerald:#0d3d2b;--emerald-mid:#1a5c40;--emerald-light:#2a7a56;--emerald-pale:#3a9e6e;
+  --sand:#f5efe3;--sand-dark:#e8ddc8;--orange:#e8720c;--orange-light:#f08930;
+  --cream:#faf6ee;--text-on-dark:#f5efe3;--text-muted:#a8c4b0;
+  --radius:16px;--radius-sm:10px;--radius-xl:24px;
+  --map-bg:#1a2f24;
+  --shadow-card:0 4px 24px rgba(0,0,0,.13);
+}
+html,body{height:100%;background:#111;font-family:'Cairo',sans-serif}
+.app-shell{max-width:420px;min-height:100vh;margin:0 auto;background:var(--emerald);position:relative;overflow:hidden}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;background:var(--emerald);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.screen.active{display:flex}
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:14px 20px 6px;font-size:12px;font-weight:700;color:var(--text-on-dark);flex-shrink:0}
+.status-icons{display:flex;gap:5px;align-items:center;font-size:13px}
+
+/* ── LANG TOGGLE ── */
+.lang-toggle-row{display:flex;justify-content:center;padding:2px 0 6px;position:relative;z-index:2}
+.lang-pill{display:flex;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:40px;padding:4px;gap:2px}
+.lang-btn{padding:8px 24px;border-radius:32px;border:none;cursor:pointer;font-size:13px;font-weight:700;letter-spacing:.3px;transition:background .22s,color .22s;background:transparent;color:rgba(255,255,255,.45)}
+.lang-btn.active{background:var(--orange);color:#fff;box-shadow:0 2px 10px rgba(232,114,12,.35)}
+
+/* ── MODE SCREEN ── */
+#s-mode{background:var(--emerald)}
+.mode-bg{position:absolute;inset:0;background-image:radial-gradient(circle at 80% 10%,rgba(232,114,12,.15) 0%,transparent 50%),radial-gradient(circle at 10% 80%,rgba(42,122,86,.3) 0%,transparent 40%);pointer-events:none}
+.mode-header{padding:32px 28px 0;text-align:center;position:relative;z-index:1}
+.darb-logo-big{font-family:'Tajawal',sans-serif;font-size:72px;font-weight:900;color:var(--sand);line-height:1;text-shadow:0 4px 24px rgba(0,0,0,.4);letter-spacing:-2px}
+.darb-logo-big span{color:var(--orange)}
+.darb-sub{font-size:12px;color:var(--text-muted);margin-top:6px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase}
+.mode-tagline{font-size:17px;color:var(--sand-dark);margin-top:10px;font-weight:600;line-height:1.6}
+.mode-cards-wrap{padding:24px 22px;display:flex;flex-direction:column;gap:14px;position:relative;z-index:1;flex:1;justify-content:center}
+.mode-card{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:var(--radius-xl);padding:24px 20px;cursor:pointer;transition:transform .2s,background .2s,border-color .2s;display:flex;align-items:center;gap:18px;position:relative;overflow:hidden}
+.mode-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.06) 0%,transparent 60%);pointer-events:none}
+.mode-card:hover{transform:translateY(-3px);background:rgba(255,255,255,.12)}
+.mode-card.driver-card:hover{border-color:var(--orange)}
+.mode-card.company-card:hover{border-color:#4ab87a}
+.mode-icon{width:58px;height:58px;border-radius:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:26px}
+.mode-icon.driver{background:rgba(232,114,12,.2)}
+.mode-icon.company{background:rgba(42,122,86,.3)}
+.mode-card-text h3{font-size:19px;font-weight:800;color:var(--sand);font-family:'Tajawal',sans-serif}
+.mode-card-text p{font-size:12.5px;color:var(--text-muted);margin-top:4px;line-height:1.6}
+.mode-badge{position:absolute;top:13px;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--orange);color:#fff;letter-spacing:.4px}
+.card-end-icon{font-size:20px;flex-shrink:0}
+.mode-footer{text-align:center;padding:0 24px 24px;position:relative;z-index:1}
+.mode-footer p{font-size:12px;color:var(--text-muted)}
+
+/* ── REGISTER SCREEN ── */
+#s-register{background:var(--cream)}
+.reg-header{background:var(--emerald);padding:50px 24px 32px;position:relative;flex-shrink:0}
+.reg-header::after{content:'';position:absolute;bottom:-20px;left:0;right:0;height:40px;background:var(--emerald);border-radius:0 0 40px 40px}
+.back-btn{background:rgba(255,255,255,.12);border:none;width:40px;height:40px;border-radius:12px;color:var(--sand);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.reg-title{font-family:'Tajawal',sans-serif;font-size:26px;font-weight:800;color:var(--sand)}
+.reg-subtitle{font-size:13px;color:var(--text-muted);margin-top:4px}
+.reg-body{padding:40px 24px 32px;display:flex;flex-direction:column;gap:20px;flex:1}
+.field-group{display:flex;flex-direction:column;gap:8px}
+.field-label{font-size:13px;font-weight:600;color:#2d4a3a}
+.field-input{background:#fff;border:1.5px solid #dde8e2;border-radius:var(--radius-sm);padding:14px 16px;font-size:15px;color:#1a3325;outline:none;transition:border-color .2s,box-shadow .2s;width:100%}
+.field-input:focus{border-color:var(--emerald-light);box-shadow:0 0 0 3px rgba(42,122,86,.12)}
+.field-input::placeholder{color:#b0c4bb}
+.upload-section{display:flex;flex-direction:column;gap:12px}
+.upload-title{font-size:14px;font-weight:700;color:#1a3325;margin-bottom:4px}
+.upload-card{background:#fff;border:2px dashed #c8ddd5;border-radius:var(--radius);padding:18px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color .2s,background .2s;position:relative;overflow:hidden}
+.upload-card input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-card:hover{border-color:var(--emerald-light);background:#f0f8f4}
+.upload-card.uploaded{border-color:var(--emerald-mid);border-style:solid;background:#edf7f1}
+.upload-icon{width:46px;height:46px;border-radius:13px;background:#e8f4ec;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.upload-card.uploaded .upload-icon{background:#c6ead4}
+.upload-info{flex:1;min-width:0}
+.upload-info h4{font-size:13px;font-weight:600;color:#1a3325}
+.upload-info p{font-size:11.5px;color:#7a9e8e;margin-top:2px}
+.upload-check{width:28px;height:28px;border-radius:50%;background:var(--emerald-mid);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;flex-shrink:0;display:none}
+.submit-btn{background:var(--emerald);color:var(--sand);border:none;border-radius:var(--radius);padding:18px;font-size:17px;font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;width:100%;margin-top:8px;transition:background .2s,transform .15s,opacity .2s;opacity:.45;pointer-events:none}
+.submit-btn.ready{opacity:1;pointer-events:all}
+.submit-btn.ready:hover{background:var(--emerald-light);transform:translateY(-2px)}
+
+/* ── FEE BANNER ── */
+.fee-banner{
+  background:linear-gradient(135deg,#1a5c40 0%,#0d3d2b 100%);
+  border:2px solid var(--orange);border-radius:var(--radius);
+  padding:18px 16px;display:flex;gap:14px;align-items:flex-start;
+  box-shadow:0 4px 20px rgba(232,114,12,.25);
+  position:relative;overflow:hidden;margin-top:4px;
+}
+.fee-banner::before{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(232,114,12,.15);}
+.fee-banner-icon{font-size:28px;flex-shrink:0;margin-top:2px}
+.fee-banner-content{flex:1}
+.fee-banner-title{font-size:12px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px}
+.fee-banner-amount{font-family:'Tajawal',sans-serif;font-size:36px;font-weight:900;color:var(--orange);line-height:1;text-shadow:0 2px 12px rgba(232,114,12,.4);margin-bottom:8px}
+.fee-banner-desc{font-size:12.5px;color:rgba(255,255,255,.8);line-height:1.6;margin-bottom:8px}
+.fee-banner-account{font-size:12px;background:rgba(255,255,255,.1);border-radius:8px;padding:6px 10px;color:var(--sand);font-weight:600;display:inline-block}
+
+/* ── VERIFY SCREEN ── */
+#s-verify{background:var(--emerald);align-items:center;justify-content:center;padding:40px 24px}
+.verify-ring{width:160px;height:160px;position:relative;margin-bottom:32px}
+.verify-ring svg{width:160px;height:160px;transform:rotate(-90deg)}
+.verify-ring-track{fill:none;stroke:rgba(255,255,255,.1);stroke-width:6}
+.verify-ring-prog{fill:none;stroke:var(--orange);stroke-width:6;stroke-linecap:round;stroke-dasharray:440;stroke-dashoffset:440;transition:stroke-dashoffset .8s ease}
+.verify-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.verify-count{font-family:'Tajawal',sans-serif;font-size:42px;font-weight:900;color:var(--sand);line-height:1}
+.verify-sec{font-size:13px;color:var(--text-muted);margin-top:2px}
+.verify-text{text-align:center}
+.verify-title{font-family:'Tajawal',sans-serif;font-size:24px;font-weight:800;color:var(--sand);margin-bottom:10px}
+.verify-subtitle{font-size:13.5px;color:var(--text-muted);line-height:1.7;max-width:290px}
+.verify-dots{display:flex;gap:8px;margin-top:22px;justify-content:center}
+.verify-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);transition:background .4s}
+.verify-dot.active{background:var(--orange)}
+.verify-steps{margin-top:28px;background:rgba(255,255,255,.06);border-radius:var(--radius);padding:18px;width:100%}
+.vstep{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.vstep:last-child{border-bottom:none}
+.vstep-icon{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:background .4s}
+.vstep.done .vstep-icon{background:rgba(42,122,86,.4)}
+.vstep-label{font-size:13px;color:var(--text-muted);flex:1}
+.vstep.done .vstep-label{color:var(--sand)}
+.vstep-status{font-size:11px;font-weight:700;color:var(--orange);white-space:nowrap}
+.vstep.done .vstep-status{color:#4ab87a}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.pulsing{animation:pulse 1.6s infinite}
+
+/* ═══════════════════════════════
+   HOME SCREEN — MAP MODE
+═══════════════════════════════ */
+#s-home{background:var(--map-bg);overflow:hidden;display:none;flex-direction:column}
+#s-home.active{display:flex}
+
+/* Top floating header bar */
+.home-topbar-float{
+  position:absolute;top:0;left:0;right:0;z-index:30;
+  padding:44px 16px 10px;
+  background:linear-gradient(to bottom,rgba(13,61,43,.92) 0%,transparent 100%);
+  display:flex;align-items:center;gap:10px;
+  pointer-events:none;
+}
+.home-topbar-float > *{pointer-events:all}
+.home-brand-sm{font-family:'Tajawal',sans-serif;font-size:22px;font-weight:900;color:var(--sand);line-height:1}
+.home-brand-sm span{color:var(--orange)}
+.topbar-search{
+  flex:1;background:rgba(255,255,255,.12);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.2);border-radius:32px;
+  padding:10px 16px;display:flex;align-items:center;gap:8px;cursor:pointer;
+}
+.topbar-search-text{font-size:13px;color:rgba(255,255,255,.6);flex:1}
+.topbar-notif{
+  width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);
+  backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.18);
+  display:flex;align-items:center;justify-content:center;font-size:17px;
+  position:relative;flex-shrink:0;cursor:pointer;
+}
+.notif-dot{width:8px;height:8px;background:var(--orange);border-radius:50%;position:absolute;top:7px;right:7px;border:2px solid var(--emerald)}
+
+/* View toggle */
+.view-toggle-wrap{
+  position:absolute;top:108px;left:50%;transform:translateX(-50%);z-index:30;
+  display:flex;background:rgba(13,40,28,.9);backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.15);border-radius:32px;padding:4px;gap:3px;
+  white-space:nowrap;
+}
+.view-toggle-btn{
+  padding:8px 18px;border-radius:28px;border:none;cursor:pointer;
+  font-size:12px;font-weight:700;font-family:'Cairo',sans-serif;
+  background:transparent;color:rgba(255,255,255,.5);transition:all .22s;
+  display:flex;align-items:center;gap:5px;
+}
+.view-toggle-btn.active{background:var(--orange);color:#fff;box-shadow:0 2px 10px rgba(232,114,12,.4)}
+
+/* ─── FAKE MAP ─── */
+.map-canvas{
+  flex:1;position:relative;overflow:hidden;background:#1e3528;
+  background-image:
+    linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+/* Road network SVG overlay */
+.map-roads{position:absolute;inset:0;pointer-events:none;opacity:.55}
+
+/* ─── CIRCULAR GIG MARKERS (reference image style) ─── */
+.map-marker-circle{
+  position:absolute;cursor:pointer;transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;z-index:10;
+  transition:transform .15s;
+}
+.map-marker-circle:hover{transform:translate(-50%,-50%) scale(1.12)}
+.circle-pin{
+  width:52px;height:52px;border-radius:50%;
+  background:var(--emerald-mid);border:3px solid #fff;
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  box-shadow:0 4px 16px rgba(0,0,0,.35);
+  transition:background .2s,box-shadow .2s;
+}
+.map-marker-circle.urgent .circle-pin{background:#c0392b}
+.map-marker-circle.active .circle-pin{background:var(--emerald-light);box-shadow:0 4px 20px rgba(232,114,12,.5);border-color:var(--orange)}
+.circle-label{
+  margin-top:4px;background:rgba(13,40,28,.9);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.15);border-radius:12px;
+  font-size:10px;font-weight:700;color:#fff;padding:3px 8px;white-space:nowrap;
+}
+
+/* My location pill */
+.my-location-wrap{pointer-events:none}
+.my-location-label{
+  background:#1a1a1a;color:#fff;font-size:12px;font-weight:700;
+  padding:6px 12px;border-radius:20px;margin-bottom:6px;white-space:nowrap;
+  box-shadow:0 2px 10px rgba(0,0,0,.4);font-family:'Plus Jakarta Sans',sans-serif;
+}
+.my-location-dot{
+  width:20px;height:20px;border-radius:50%;background:#1a1a1a;border:3px solid #fff;
+  margin:0 auto;box-shadow:0 0 0 5px rgba(0,0,0,.2);
+}
+
+/* Gig markers (legacy — keep for compatibility) */
+.map-marker{
+  position:absolute;cursor:pointer;transform:translate(-50%,-100%);
+  display:flex;flex-direction:column;align-items:center;z-index:10;
+  transition:transform .15s;
+}
+.map-marker:hover{transform:translate(-50%,-100%) scale(1.1)}
+.marker-pin{
+  background:var(--emerald-mid);border:2.5px solid #fff;
+  border-radius:20px 20px 20px 4px;padding:6px 10px;
+  font-size:11px;font-weight:700;color:#fff;
+  box-shadow:0 4px 14px rgba(0,0,0,.4);
+  display:flex;align-items:center;gap:4px;white-space:nowrap;
+  transition:background .2s;
+}
+.map-marker.urgent .marker-pin{background:var(--orange)}
+.map-marker.active .marker-pin{background:#1d6e46;border-color:var(--orange);box-shadow:0 4px 18px rgba(232,114,12,.5)}
+.marker-stem{width:3px;height:10px;background:inherit;border-radius:0 0 3px 3px;background:rgba(255,255,255,.6)}
+
+/* Map controls */
+.map-controls{
+  position:absolute;left:14px;bottom:210px;z-index:20;
+  display:flex;flex-direction:column;gap:8px;
+}
+.map-ctrl-btn{
+  width:38px;height:38px;background:rgba(13,40,28,.9);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.15);border-radius:10px;
+  color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 10px rgba(0,0,0,.3);
+}
+
+/* Locate me button */
+.locate-btn{
+  position:absolute;right:14px;bottom:210px;z-index:20;
+  width:42px;height:42px;background:var(--emerald);
+  border:2px solid rgba(255,255,255,.25);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.3);
+}
+
+/* ─── BOTTOM SHEET (map peek) ─── */
+.map-bottom-sheet{
+  position:absolute;bottom:0;left:0;right:0;z-index:25;
+  background:rgba(11,34,22,.96);backdrop-filter:blur(18px);
+  border-radius:24px 24px 0 0;border-top:1px solid rgba(255,255,255,.1);
+  padding:0 0 20px;
+  transform:translateY(0);transition:transform .35s cubic-bezier(.2,.8,.2,1);
+}
+.sheet-pill{width:38px;height:4px;background:rgba(255,255,255,.2);border-radius:4px;margin:12px auto 14px}
+.sheet-header{padding:0 18px 12px;display:flex;align-items:center;justify-content:space-between}
+.sheet-title{font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;color:var(--sand)}
+.sheet-count{font-size:12px;color:var(--text-muted)}
+.sheet-count strong{color:var(--orange)}
+.sheet-scroll{display:flex;gap:12px;padding:0 18px 4px;overflow-x:auto;scrollbar-width:none}
+.sheet-scroll::-webkit-scrollbar{display:none}
+
+/* Gig card (horizontal peek) */
+.gig-card-h{
+  min-width:260px;max-width:260px;background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:14px;
+  cursor:pointer;transition:border-color .2s,background .2s;flex-shrink:0;
+}
+.gig-card-h:hover,.gig-card-h.selected{border-color:var(--orange);background:rgba(232,114,12,.08)}
+.gig-card-h.urgent{border-color:rgba(232,114,12,.35)}
+
+.gig-company-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.gig-avatar{width:32px;height:32px;border-radius:10px;background:var(--emerald-mid);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.gig-company-name{font-size:12px;font-weight:700;color:var(--sand);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gig-rating-badge{display:flex;align-items:center;gap:3px;font-size:10px;font-weight:700;color:#fbbf24}
+.gig-trips-badge{font-size:10px;color:var(--text-muted)}
+
+.gig-route{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.gig-city{font-size:13px;font-weight:800;color:var(--sand);font-family:'Tajawal',sans-serif}
+.gig-arrow{color:var(--text-muted);font-size:11px}
+.gig-badges-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.gig-badge-chip{font-size:10px;font-weight:600;padding:3px 8px;border-radius:12px;background:rgba(255,255,255,.08);color:var(--text-muted)}
+.gig-badge-chip.urgent-chip{background:rgba(232,114,12,.2);color:var(--orange-light)}
+
+.gig-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.gig-stat-item{background:rgba(255,255,255,.05);border-radius:10px;padding:8px 10px}
+.gig-stat-val{font-size:13px;font-weight:800;color:var(--sand);font-family:'Tajawal',sans-serif}
+.gig-stat-label{font-size:10px;color:var(--text-muted);margin-top:1px}
+
+.gig-price-row{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.gig-price{font-family:'Tajawal',sans-serif;font-size:16px;font-weight:900;color:#4ab87a}
+.gig-price-label{font-size:10px;color:var(--text-muted)}
+
+.bargain-btn{
+  background:rgba(232,114,12,.15);border:1px solid rgba(232,114,12,.4);
+  border-radius:12px;padding:7px 12px;font-size:11px;font-weight:700;
+  color:var(--orange-light);cursor:pointer;transition:background .2s;
+  font-family:'Cairo',sans-serif;display:flex;align-items:center;gap:4px;
+}
+.bargain-btn:hover{background:rgba(232,114,12,.28)}
+
+/* ─── LIST VIEW ─── */
+#list-view-panel{
+  display:none;flex-direction:column;flex:1;overflow-y:auto;
+  background:#f0f4f2;padding-top:140px;
+  position:absolute;inset:0;z-index:22;
+}
+#list-view-panel.visible{display:flex}
+.list-header{padding:0 18px 10px}
+.list-title{font-family:'Tajawal',sans-serif;font-size:16px;font-weight:700;color:var(--emerald)}
+.list-subtitle{font-size:12px;color:#7a9e8e}
+.list-items{display:flex;flex-direction:column;gap:12px;padding:0 16px 110px}
+
+/* List gig card (vertical full) */
+.gig-card-v{
+  background:#fff;border-radius:18px;padding:16px;
+  border:1px solid #e0ebe5;box-shadow:0 2px 12px rgba(0,0,0,.06);
+  cursor:pointer;transition:transform .15s,box-shadow .15s;
+}
+.gig-card-v:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.1)}
+.gig-card-v .gig-company-row{margin-bottom:12px}
+.gig-card-v .gig-avatar{background:var(--emerald);width:36px;height:36px;border-radius:12px}
+.gig-card-v .gig-company-name{color:#1a3325}
+.gig-card-v .gig-trips-badge{color:#7a9e8e}
+.gig-card-v .gig-route{margin-bottom:10px}
+.gig-card-v .gig-city{color:var(--emerald)}
+.gig-card-v .gig-badge-chip{background:#f0f7f4;color:#5a8a70}
+.gig-card-v .gig-badge-chip.urgent-chip{background:#fff3e8;color:var(--orange)}
+.gig-card-v .gig-stat-item{background:#f7faf8;border-radius:10px}
+.gig-card-v .gig-stat-val{color:var(--emerald)}
+.gig-card-v .gig-stat-label{color:#7a9e8e}
+.gig-card-v .gig-price{color:#1a6e42}
+.gig-card-v .bargain-btn{background:#fff3e8;border-color:rgba(232,114,12,.35);color:var(--orange)}
+.gig-card-v .bargain-btn:hover{background:#fde8d2}
+.view-details-btn{
+  background:var(--emerald);color:var(--sand);border:none;border-radius:12px;
+  padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;
+  font-family:'Cairo',sans-serif;transition:background .2s,transform .15s;
+  white-space:nowrap;
+}
+.view-details-btn:hover{background:var(--emerald-light);transform:translateY(-1px)}
+
+/* Scroll-gate for offer actions */
+.scroll-gate-notice{
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:12px;padding:12px 16px;text-align:center;
+  font-size:12px;color:var(--text-muted);margin-top:8px;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.modal-actions.locked{opacity:.5;pointer-events:none}
+.v-divider{height:1px;background:#edf2ef;margin:12px 0}
+.gig-card-v .gig-distance-row{display:flex;align-items:center;gap:6px;font-size:12px;color:#7a9e8e;margin-bottom:10px}
+.gig-card-v .gig-distance-row strong{color:var(--orange);font-weight:700}
+
+/* ─── GIG DETAIL MODAL ─── */
+.modal-overlay{
+  position:absolute;inset:0;z-index:50;
+  background:rgba(5,18,12,.7);backdrop-filter:blur(6px);
+  display:none;align-items:flex-end;
+}
+.modal-overlay.open{display:flex;animation:fadeOverlay .25s ease}
+@keyframes fadeOverlay{from{opacity:0}to{opacity:1}}
+.modal-sheet{
+  width:100%;background:#0e2f1e;border-radius:28px 28px 0 0;
+  border-top:1px solid rgba(255,255,255,.12);
+  max-height:88vh;overflow-y:auto;
+  animation:slideUp .3s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-pill{width:38px;height:4px;background:rgba(255,255,255,.2);border-radius:4px;margin:14px auto 18px}
+.modal-close{position:absolute;top:14px;right:18px;background:rgba(255,255,255,.1);border:none;width:32px;height:32px;border-radius:50%;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2}
+.modal-body{padding:0 20px 32px}
+.modal-section{margin-bottom:18px}
+.modal-label{font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px}
+
+/* Driver profile strip */
+.driver-profile{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.06);border-radius:16px;padding:14px}
+.driver-avatar{width:52px;height:52px;border-radius:16px;background:var(--emerald-mid);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.driver-info{flex:1}
+.driver-name{font-size:15px;font-weight:700;color:var(--sand);font-family:'Tajawal',sans-serif}
+.driver-company{font-size:12px;color:var(--text-muted);margin-top:2px}
+.driver-stats-mini{display:flex;gap:10px;margin-top:6px}
+.driver-stat{font-size:11px;color:var(--text-muted)}
+.driver-stat strong{color:var(--sand)}
+.driver-verified{font-size:10px;background:rgba(74,184,122,.15);color:#4ab87a;padding:3px 8px;border-radius:10px;font-weight:700;align-self:flex-start}
+
+/* Info grid */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.info-cell{background:rgba(255,255,255,.05);border-radius:12px;padding:12px}
+.info-cell-icon{font-size:18px;margin-bottom:4px}
+.info-cell-val{font-size:16px;font-weight:800;color:var(--sand);font-family:'Tajawal',sans-serif}
+.info-cell-label{font-size:11px;color:var(--text-muted);margin-top:2px}
+.info-cell.highlight{background:rgba(74,184,122,.1);border:1px solid rgba(74,184,122,.2)}
+.info-cell.highlight .info-cell-val{color:#4ab87a}
+
+/* Route visual */
+.route-visual{display:flex;flex-direction:column;gap:0;background:rgba(255,255,255,.05);border-radius:16px;padding:16px 14px}
+.route-point{display:flex;align-items:center;gap:10px}
+.route-dot{width:12px;height:12px;border-radius:50%;border:2.5px solid;flex-shrink:0}
+.route-dot.origin{border-color:#4ab87a;background:rgba(74,184,122,.3)}
+.route-dot.dest{border-color:var(--orange);background:rgba(232,114,12,.3)}
+.route-city-name{font-size:14px;font-weight:700;color:var(--sand);flex:1}
+.route-city-sub{font-size:11px;color:var(--text-muted)}
+.route-line{width:2px;height:20px;background:rgba(255,255,255,.1);margin:4px 0 4px 5px}
+
+/* Bargain UI */
+.bargain-panel{background:rgba(232,114,12,.08);border:1px solid rgba(232,114,12,.25);border-radius:16px;padding:14px}
+.bargain-current{font-size:13px;color:var(--text-muted);margin-bottom:10px}
+.bargain-current strong{color:var(--orange-light);font-size:17px;font-family:'Tajawal',sans-serif}
+.bargain-input-row{display:flex;gap:8px}
+.bargain-input{
+  flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  border-radius:12px;padding:12px 14px;font-size:15px;color:#fff;
+  outline:none;font-family:'Tajawal',sans-serif;font-weight:700;text-align:center;
+}
+.bargain-input::placeholder{color:rgba(255,255,255,.3);font-size:13px}
+.bargain-input:focus{border-color:var(--orange)}
+.bargain-send{
+  background:var(--orange);color:#fff;border:none;border-radius:12px;
+  padding:12px 18px;font-size:13px;font-weight:700;cursor:pointer;
+  font-family:'Cairo',sans-serif;white-space:nowrap;
+  transition:background .2s;
+}
+.bargain-send:hover{background:var(--orange-light)}
+.bargain-hint{font-size:11px;color:var(--text-muted);margin-top:8px}
+.bargain-offers{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.bargain-offer-item{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.04);border-radius:10px;padding:8px 12px}
+.offer-val{font-size:14px;font-weight:700;color:var(--sand);font-family:'Tajawal',sans-serif}
+.offer-status{font-size:10px;font-weight:700;padding:3px 8px;border-radius:8px}
+.offer-status.pending{background:rgba(255,255,255,.08);color:var(--text-muted)}
+.offer-status.accepted{background:rgba(74,184,122,.2);color:#4ab87a}
+.offer-status.declined{background:rgba(200,80,60,.15);color:#e07060}
+
+/* Accept / Chat actions */
+.modal-actions{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.accept-btn{
+  background:var(--emerald-mid);color:var(--sand);border:none;border-radius:var(--radius);
+  padding:17px;font-size:16px;font-weight:700;font-family:'Tajawal',sans-serif;
+  cursor:pointer;width:100%;transition:background .2s,transform .15s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.accept-btn:hover{background:var(--emerald-light);transform:translateY(-1px)}
+.accept-btn.accepted{background:#1a6e42}
+.chat-btn{
+  background:rgba(255,255,255,.07);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.12);
+  border-radius:var(--radius);padding:14px;font-size:14px;font-weight:700;
+  cursor:not-allowed;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+  font-family:'Cairo',sans-serif;transition:all .2s;
+}
+.chat-btn.unlocked{
+  background:rgba(42,122,86,.2);color:#4ab87a;border-color:rgba(74,184,122,.35);
+  cursor:pointer;
+}
+.chat-btn.unlocked:hover{background:rgba(42,122,86,.35)}
+.chat-lock{font-size:14px}
+.no-contact-note{
+  font-size:11px;color:var(--text-muted);text-align:center;margin-top:6px;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+
+/* ─── BOTTOM NAV ─── */
+.bottom-nav{
+  display:flex;align-items:center;background:rgba(9,28,18,.97);backdrop-filter:blur(16px);
+  border-top:1px solid rgba(255,255,255,.1);padding:10px 0 24px;
+  position:absolute;bottom:0;left:0;right:0;z-index:28;
+  box-shadow:0 -4px 20px rgba(0,0,0,.2);
+}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px;font-size:11px;color:rgba(255,255,255,.4);font-weight:500;transition:color .15s,transform .15s}
+.nav-item:hover{transform:translateY(-1px)}
+.nav-item.active{color:var(--orange)}
+.nav-icon{font-size:22px}
+
+/* ─── CHAT SCREEN ─── */
+#s-chat{background:#0e2f1e;display:none;flex-direction:column}
+#s-chat.active{display:flex}
+.chat-header{background:var(--emerald);padding:48px 18px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.chat-back{background:rgba(255,255,255,.1);border:none;width:38px;height:38px;border-radius:12px;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.chat-info{flex:1}
+.chat-name{font-size:15px;font-weight:700;color:var(--sand);font-family:'Tajawal',sans-serif}
+.chat-status{font-size:11px;color:#4ab87a}
+.chat-avatar{width:40px;height:40px;border-radius:13px;background:var(--emerald-mid);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.chat-messages{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:10px}
+.chat-msg{max-width:78%;display:flex;flex-direction:column}
+.chat-msg.sent{align-self:flex-start}
+.chat-msg.recv{align-self:flex-end}
+.chat-bubble{padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.5;color:#fff}
+.chat-msg.sent .chat-bubble{background:rgba(255,255,255,.1);border-radius:4px 18px 18px 18px}
+.chat-msg.recv .chat-bubble{background:var(--emerald-mid);border-radius:18px 4px 18px 18px}
+.chat-time{font-size:10px;color:var(--text-muted);margin-top:4px;padding:0 4px}
+.chat-input-row{display:flex;gap:8px;padding:12px 16px 34px;background:rgba(9,28,18,.9);border-top:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.chat-input{flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:12px 18px;font-size:14px;color:#fff;outline:none;font-family:'Cairo',sans-serif}
+.chat-input::placeholder{color:rgba(255,255,255,.3)}
+.chat-send{width:42px;height:42px;border-radius:50%;background:var(--orange);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.privacy-banner{background:rgba(255,255,255,.05);border-top:1px solid rgba(255,255,255,.08);padding:8px 16px;text-align:center;font-size:11px;color:var(--text-muted);display:flex;align-items:center;justify-content:center;gap:5px;flex-shrink:0}
+
+.screen-enter{animation:sIn .32s ease forwards}
+@keyframes sIn{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:translateX(0)}}
+</style>
+</head>
+<body>
+<div class="app-shell" id="app">
+
+<!-- ═══ SCREEN 1: MODE SELECT ═══ -->
+<div class="screen active" id="s-mode">
+  <div class="mode-bg"></div>
+  <div class="status-bar"><span>9:41</span><div class="status-icons">📶 🔋</div></div>
+  <div class="mode-header">
+    <div class="darb-logo-big">درب<span>.</span></div>
+    <div class="darb-sub" id="t-tagSub">منصة درب اللوجستية</div>
+    <div class="mode-tagline" id="t-tagline">نقل بضاعتك بثقة وأمان</div>
+  </div>
+  <div class="mode-cards-wrap">
+    <div class="mode-card company-card">
+      <div class="mode-icon company">🏢</div>
+      <div class="mode-card-text">
+        <h3 id="t-companyTitle">صاحب بضاعة</h3>
+        <p id="t-companyDesc">ابحث عن شاحنات موثوقة لنقل بضاعتك في أي مكان</p>
+      </div>
+      <span class="card-end-icon" style="color:var(--text-muted)" id="arrow-company">›</span>
+    </div>
+    <div class="mode-card driver-card" onclick="goTo('s-register')">
+      <div class="mode-badge" id="driver-badge" style="right:14px">مميز</div>
+      <div class="mode-icon driver">🚛</div>
+      <div class="mode-card-text">
+        <h3 id="t-driverTitle">سائق / ناقل</h3>
+        <p id="t-driverDesc">اعثر على شحنات في طريقك وزد دخلك بكل سهولة</p>
+      </div>
+      <span class="card-end-icon" style="color:var(--orange)" id="arrow-driver">›</span>
+    </div>
+  </div>
+  <div class="mode-footer">
+    <p id="t-footer">بتسجيلك، أنت توافق على <span style="color:var(--orange)">الشروط والأحكام</span></p>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 2: REGISTER ═══ -->
+<div class="screen" id="s-register">
+  <div class="reg-header">
+    <button class="back-btn" id="back-btn" onclick="goTo('s-mode')">‹</button>
+    <div class="reg-title" id="t-regTitle">تسجيل سائق 🚛</div>
+    <div class="reg-subtitle" id="t-regSub">أدخل بياناتك لتبدأ العمل فوراً</div>
+  </div>
+  <div class="reg-body">
+    <div class="field-group">
+      <label class="field-label" id="t-labelName">الاسم الكامل</label>
+      <input class="field-input" id="f-name" type="text" placeholder="مثال: أحمد محمد الصنعاني" oninput="checkForm()" style="text-align:right;font-family:'Cairo',sans-serif">
+    </div>
+    <div class="field-group">
+      <label class="field-label" id="t-labelAge">العمر</label>
+      <input class="field-input" id="f-age" type="number" placeholder="يجب أن يكون 18 أو أكبر" min="18" max="70" oninput="checkForm()" style="text-align:right;font-family:'Cairo',sans-serif">
+    </div>
+    <div class="field-group">
+      <label class="field-label" id="t-labelPhone">رقم الهاتف</label>
+      <input class="field-input" id="f-phone" type="tel" placeholder="+967 7XX XXX XXX" oninput="checkForm()" style="text-align:right;font-family:'Cairo',sans-serif">
+    </div>
+    <div class="upload-section">
+      <div class="upload-title" id="t-uploadTitle">📎 المستندات المطلوبة</div>
+      <div class="upload-card" id="uc-lf">
+        <input type="file" accept="image/*" onchange="handleUpload(this,'uc-lf','ui-lf','lf')">
+        <div class="upload-icon" id="ui-lf">🪪</div>
+        <div class="upload-info"><h4 id="t-ulf">صورة رخصة القيادة (أمامية)</h4><p id="t-uploadHint1">اضغط للرفع • JPG, PNG</p></div>
+        <div class="upload-check" id="chk-lf">✓</div>
+      </div>
+      <div class="upload-card" id="uc-lb">
+        <input type="file" accept="image/*" onchange="handleUpload(this,'uc-lb','ui-lb','lb')">
+        <div class="upload-icon" id="ui-lb">🪪</div>
+        <div class="upload-info"><h4 id="t-ulb">صورة رخصة القيادة (خلفية)</h4><p id="t-uploadHint2">اضغط للرفع • JPG, PNG</p></div>
+        <div class="upload-check" id="chk-lb">✓</div>
+      </div>
+      <div class="upload-card" id="uc-rc">
+        <input type="file" accept="image/*,application/pdf" onchange="handleUpload(this,'uc-rc','ui-rc','rc')">
+        <div class="upload-icon" id="ui-rc">🧾</div>
+        <div class="upload-info"><h4 id="t-urc">إيصال الدفع / Payment Receipt</h4><p id="t-uploadHint3">اضغط للرفع • JPG, PNG, PDF</p></div>
+        <div class="upload-check" id="chk-rc">✓</div>
+      </div>
+    </div>
+
+    <!-- FEE BANNER -->
+    <div class="fee-banner" id="fee-banner">
+      <div class="fee-banner-icon">💳</div>
+      <div class="fee-banner-content">
+        <div class="fee-banner-title" id="t-feeTitle">رسوم التسجيل المطلوبة</div>
+        <div class="fee-banner-amount" id="t-feeAmount">200 ر.يـ</div>
+        <div class="fee-banner-desc" id="t-feeDesc">يُرجى تحويل رسوم التسجيل وإرفاق إيصال الدفع أعلاه</div>
+        <div class="fee-banner-account" id="t-feeAccount">📱 رقم المحفظة: 777-123-456</div>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="submit-btn" onclick="submitForm()">إرسال البيانات للمراجعة ←</button>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 3: VERIFY ═══ -->
+<div class="screen" id="s-verify">
+  <div class="verify-ring">
+    <svg viewBox="0 0 160 160">
+      <circle class="verify-ring-track" cx="80" cy="80" r="70"/>
+      <circle class="verify-ring-prog" id="prog-ring" cx="80" cy="80" r="70"/>
+    </svg>
+    <div class="verify-inner">
+      <div class="verify-count" id="v-count">10</div>
+      <div class="verify-sec" id="t-vSec">ثانية</div>
+    </div>
+  </div>
+  <div class="verify-text">
+    <div class="verify-title" id="t-vTitle">جاري التحقق من بياناتك</div>
+    <div class="verify-subtitle pulsing" id="t-vSubtitle">نراجع مستنداتك للتأكد من صحتها. سيتم تفعيل حسابك خلال لحظات ✨</div>
+    <div class="verify-dots">
+      <div class="verify-dot active" id="vd0"></div>
+      <div class="verify-dot" id="vd1"></div>
+      <div class="verify-dot" id="vd2"></div>
+    </div>
+  </div>
+  <div class="verify-steps">
+    <div class="vstep" id="vstep0"><div class="vstep-icon">📋</div><div class="vstep-label" id="t-vstep0">التحقق من البيانات الشخصية</div><div class="vstep-status" id="vstatus0">جاري...</div></div>
+    <div class="vstep" id="vstep1"><div class="vstep-icon">🪪</div><div class="vstep-label" id="t-vstep1">فحص رخصة القيادة</div><div class="vstep-status" id="vstatus1">انتظار</div></div>
+    <div class="vstep" id="vstep2"><div class="vstep-icon">🧾</div><div class="vstep-label" id="t-vstep2">التحقق من إيصال الدفع</div><div class="vstep-status" id="vstatus2">انتظار</div></div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 4: HOME (MAP) ═══ -->
+<div class="screen" id="s-home">
+
+  <!-- Floating top bar -->
+  <div class="home-topbar-float">
+    <div class="home-brand-sm">درب<span>.</span></div>
+    <div class="topbar-search" onclick="alert('بحث...')">
+      <span style="font-size:14px">🔍</span>
+      <span class="topbar-search-text" id="t-searchHint">ابحث عن شحنة أو مسار...</span>
+    </div>
+    <div class="topbar-notif">🔔<div class="notif-dot"></div></div>
+  </div>
+
+  <!-- View toggle -->
+  <div class="view-toggle-wrap">
+    <button class="view-toggle-btn active" id="btn-map-view" onclick="setView('map')">
+      <span>🗺️</span> <span id="t-mapView">خريطة</span>
+    </button>
+    <button class="view-toggle-btn" id="btn-list-view" onclick="setView('list')">
+      <span>☰</span> <span id="t-listView">قائمة</span>
+    </button>
+  </div>
+
+  <!-- MAP CANVAS — interactive pan + zoom -->
+  <div class="map-canvas" id="map-canvas" style="overflow:hidden;touch-action:none;cursor:grab">
+    <!-- The pannable/zoomable world -->
+    <div id="map-world" style="position:absolute;width:1260px;height:1680px;top:0;left:0;transform-origin:0 0;will-change:transform">
+      <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.65" viewBox="0 0 1260 1680" xmlns="http://www.w3.org/2000/svg">
+        <!-- Major roads H -->
+        <line x1="0" y1="420" x2="1260" y2="420" stroke="#2a4a38" stroke-width="28"/><line x1="0" y1="420" x2="1260" y2="420" stroke="#1e3d2a" stroke-width="14"/>
+        <line x1="0" y1="840" x2="1260" y2="840" stroke="#2a4a38" stroke-width="28"/><line x1="0" y1="840" x2="1260" y2="840" stroke="#1e3d2a" stroke-width="14"/>
+        <line x1="0" y1="1260" x2="1260" y2="1260" stroke="#2a4a38" stroke-width="28"/><line x1="0" y1="1260" x2="1260" y2="1260" stroke="#1e3d2a" stroke-width="14"/>
+        <!-- Major roads V -->
+        <line x1="420" y1="0" x2="420" y2="1680" stroke="#2a4a38" stroke-width="28"/><line x1="420" y1="0" x2="420" y2="1680" stroke="#1e3d2a" stroke-width="14"/>
+        <line x1="840" y1="0" x2="840" y2="1680" stroke="#2a4a38" stroke-width="28"/><line x1="840" y1="0" x2="840" y2="1680" stroke="#1e3d2a" stroke-width="14"/>
+        <!-- Secondary H -->
+        <line x1="0" y1="210" x2="1260" y2="210" stroke="#1f3a2c" stroke-width="12"/>
+        <line x1="0" y1="630" x2="1260" y2="630" stroke="#1f3a2c" stroke-width="12"/>
+        <line x1="0" y1="1050" x2="1260" y2="1050" stroke="#1f3a2c" stroke-width="12"/>
+        <line x1="0" y1="1470" x2="1260" y2="1470" stroke="#1f3a2c" stroke-width="12"/>
+        <!-- Secondary V -->
+        <line x1="140" y1="0" x2="140" y2="1680" stroke="#1f3a2c" stroke-width="12"/>
+        <line x1="630" y1="0" x2="630" y2="1680" stroke="#1f3a2c" stroke-width="12"/>
+        <line x1="1050" y1="0" x2="1050" y2="1680" stroke="#1f3a2c" stroke-width="12"/>
+        <!-- Tertiary H -->
+        <line x1="0" y1="315" x2="1260" y2="315" stroke="#192d21" stroke-width="5"/>
+        <line x1="0" y1="525" x2="1260" y2="525" stroke="#192d21" stroke-width="5"/>
+        <line x1="0" y1="735" x2="1260" y2="735" stroke="#192d21" stroke-width="5"/>
+        <line x1="0" y1="945" x2="1260" y2="945" stroke="#192d21" stroke-width="5"/>
+        <line x1="0" y1="1155" x2="1260" y2="1155" stroke="#192d21" stroke-width="5"/>
+        <!-- Tertiary V -->
+        <line x1="280" y1="0" x2="280" y2="1680" stroke="#192d21" stroke-width="5"/>
+        <line x1="490" y1="0" x2="490" y2="1680" stroke="#192d21" stroke-width="5"/>
+        <line x1="700" y1="0" x2="700" y2="1680" stroke="#192d21" stroke-width="5"/>
+        <line x1="910" y1="0" x2="910" y2="1680" stroke="#192d21" stroke-width="5"/>
+        <line x1="1120" y1="0" x2="1120" y2="1680" stroke="#192d21" stroke-width="5"/>
+        <!-- Buildings -->
+        <rect x="155" y="225" width="115" height="165" rx="8" fill="#192d21" opacity=".7"/>
+        <rect x="295" y="225" width="105" height="165" rx="8" fill="#192d21" opacity=".6"/>
+        <rect x="435" y="225" width="165" height="165" rx="8" fill="#192d21" opacity=".65"/>
+        <rect x="645" y="225" width="165" height="165" rx="8" fill="#192d21" opacity=".6"/>
+        <rect x="855" y="225" width="165" height="165" rx="8" fill="#192d21" opacity=".65"/>
+        <rect x="1065" y="225" width="115" height="165" rx="8" fill="#192d21" opacity=".6"/>
+        <rect x="155" y="435" width="115" height="165" rx="8" fill="#192d21" opacity=".55"/>
+        <rect x="295" y="435" width="105" height="165" rx="8" fill="#192d21" opacity=".5"/>
+        <rect x="435" y="645" width="165" height="165" rx="8" fill="#192d21" opacity=".6"/>
+        <rect x="645" y="435" width="165" height="165" rx="8" fill="#192d21" opacity=".55"/>
+        <rect x="855" y="645" width="165" height="165" rx="8" fill="#192d21" opacity=".6"/>
+        <rect x="155" y="855" width="255" height="165" rx="8" fill="#192d21" opacity=".6"/>
+        <rect x="445" y="855" width="165" height="165" rx="8" fill="#192d21" opacity=".55"/>
+        <rect x="645" y="855" width="165" height="165" rx="8" fill="#192d21" opacity=".6"/>
+        <rect x="855" y="855" width="165" height="165" rx="8" fill="#192d21" opacity=".55"/>
+        <rect x="1065" y="855" width="115" height="165" rx="8" fill="#192d21" opacity=".6"/>
+        <rect x="155" y="1065" width="255" height="165" rx="8" fill="#192d21" opacity=".55"/>
+        <rect x="645" y="1065" width="165" height="165" rx="8" fill="#192d21" opacity=".5"/>
+        <rect x="855" y="1065" width="165" height="165" rx="8" fill="#192d21" opacity=".55"/>
+        <!-- Green zones -->
+        <circle cx="240" cy="180" r="90" fill="rgba(42,122,86,.2)"/>
+        <circle cx="1020" cy="1260" r="130" fill="rgba(42,122,86,.15)"/>
+        <circle cx="700" cy="700" r="70" fill="rgba(42,122,86,.13)"/>
+        <circle cx="200" cy="1400" r="80" fill="rgba(42,122,86,.15)"/>
+      </svg>
+
+      <!-- Gig markers at absolute world positions -->
+      <div class="map-marker-circle urgent" style="position:absolute;top:350px;left:380px;transform:translate(-50%,-50%)" onclick="openGig(0)" id="marker-0"><div class="circle-pin">🚛</div><div class="circle-label">150K ر.ي</div></div>
+      <div class="map-marker-circle" style="position:absolute;top:200px;left:740px;transform:translate(-50%,-50%)" onclick="openGig(1)" id="marker-1"><div class="circle-pin">🚚</div><div class="circle-label">250K ر.ي</div></div>
+      <div class="map-marker-circle urgent" style="position:absolute;top:640px;left:860px;transform:translate(-50%,-50%)" onclick="openGig(2)" id="marker-2"><div class="circle-pin">🚛</div><div class="circle-label">120K ر.ي</div></div>
+      <div class="map-marker-circle" style="position:absolute;top:790px;left:510px;transform:translate(-50%,-50%)" onclick="openGig(3)" id="marker-3"><div class="circle-pin">🚜</div><div class="circle-label">90K ر.ي</div></div>
+
+      <!-- My location -->
+      <div style="position:absolute;top:490px;left:400px;transform:translate(-50%,-100%);z-index:15;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:5px">
+        <div style="background:rgba(15,15,15,.92);color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:18px;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,.5);font-family:'Cairo',sans-serif">موقعي الحالي</div>
+        <div style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:9px solid rgba(15,15,15,.92)"></div>
+        <div style="width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #0d3d2b;box-shadow:0 0 0 5px rgba(13,61,43,.3)"></div>
+      </div>
+    </div><!-- end map-world -->
+
+    <!-- Controls fixed over canvas -->
+    <div class="map-controls">
+      <div class="map-ctrl-btn" onclick="mapZoom(1.3)">+</div>
+      <div class="map-ctrl-btn" onclick="mapZoom(0.77)">−</div>
+    </div>
+    <div class="locate-btn" onclick="mapReset()">📍</div>
+  </div>
+
+  <!-- Bottom sheet with horizontal gig cards -->
+  <div class="map-bottom-sheet" id="map-bottom-sheet">
+    <div class="sheet-pill"></div>
+    <div class="sheet-header">
+      <div>
+        <div class="sheet-title" id="t-sheetTitle">شحنات قريبة منك</div>
+        <div class="sheet-count"><strong>4</strong> <span id="t-sheetCount">شحنات متاحة الآن</span></div>
+      </div>
+    </div>
+    <div class="sheet-scroll" id="sheet-scroll">
+      <!-- Cards injected by JS -->
+    </div>
+  </div>
+
+  <!-- List view panel -->
+  <div id="list-view-panel">
+    <div class="list-items" id="list-items">
+      <!-- Cards injected by JS -->
+    </div>
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <div class="nav-item" id="nav-account" onclick="goTo('s-account')"><div class="nav-icon">👤</div><span id="t-navAcc">الحساب</span></div>
+    <div class="nav-item active" id="nav-home" onclick="goTo('s-home')"><div class="nav-icon">🏠</div><span id="t-navHome">الرئيسية</span></div>
+    <div class="nav-item" id="nav-trips" onclick="goTo('s-trips')"><div class="nav-icon">🗺️</div><span id="t-navTrips">رحلاتي</span></div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 5: CHAT ═══ -->
+<div class="screen" id="s-chat">
+  <div class="chat-header">
+    <button class="chat-back" id="chat-back-btn" onclick="goTo('s-home')">‹</button>
+    <div class="chat-info">
+      <div class="chat-name" id="chat-company-name">شركة النقل اليمني</div>
+      <div class="chat-status" id="chat-status-line">🟢 متصل الآن</div>
+    </div>
+    <div class="chat-avatar" id="chat-avatar-icon">🏢</div>
+  </div>
+  <div class="privacy-banner">🔒 <span id="t-privacyNote">لن يتم مشاركة بيانات الاتصال بين الطرفين</span></div>
+  <div class="chat-messages" id="chat-messages"></div>
+  <div class="chat-input-row" id="chat-input-row">
+    <input class="chat-input" id="chat-input-field" placeholder="اكتب رسالة..." style="text-align:right;font-family:'Cairo',sans-serif" onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="chat-send" onclick="sendChat()">➤</button>
+  </div>
+</div>
+
+<!-- GIG DETAIL MODAL -->
+<div class="modal-overlay" id="gig-modal">
+  <div class="modal-sheet" id="gig-modal-sheet">
+    <div style="position:relative">
+      <div class="modal-pill"></div>
+      <button class="modal-close" onclick="closeGig()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body">
+      <!-- injected -->
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: PAST TRIPS ═══ -->
+<div class="screen" id="s-trips" style="background:#f0f4f2">
+  <div class="trips-header">
+    <div class="trips-title">🗺️ رحلاتي</div>
+    <div class="trips-subtitle">سجل رحلاتك المكتملة والأرباح</div>
+    <div class="trips-stats-row">
+      <div class="trip-stat-pill"><div class="trip-stat-pill-val">12</div><div class="trip-stat-pill-label">رحلة مكتملة</div></div>
+      <div class="trip-stat-pill"><div class="trip-stat-pill-val">1.4M</div><div class="trip-stat-pill-label">إجمالي الأرباح</div></div>
+      <div class="trip-stat-pill"><div class="trip-stat-pill-val">4.9 ⭐</div><div class="trip-stat-pill-label">تقييمك</div></div>
+    </div>
+  </div>
+  <div class="trips-body" id="trips-body">
+    <!-- Injected by JS -->
+  </div>
+  <div class="trips-nav">
+    <div class="nav-item" onclick="goTo('s-account')"><div class="nav-icon">👤</div><span>الحساب</span></div>
+    <div class="nav-item" onclick="goTo('s-home')"><div class="nav-icon">🏠</div><span>الرئيسية</span></div>
+    <div class="nav-item active"><div class="nav-icon">🗺️</div><span>رحلاتي</span></div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: ACCOUNT ═══ -->
+<div class="screen" id="s-account" style="background:#f0f4f2">
+  <div class="account-header">
+    <div class="account-avatar-lg">🚛</div>
+    <div class="account-name">أحمد محمد الصنعاني</div>
+    <div class="account-badge">✓ سائق موثق</div>
+  </div>
+  <div class="account-body">
+    <div class="account-section-title">معلومات الحساب</div>
+    <div class="account-card">
+      <div class="account-row"><div class="account-row-icon">📱</div><div class="account-row-label">رقم الهاتف</div><div class="account-row-val">+967 777 123 456</div><div class="account-row-arrow">›</div></div>
+      <div class="account-row"><div class="account-row-icon">🚛</div><div class="account-row-label">نوع الشاحنة</div><div class="account-row-val">شاحنة ثقيلة</div><div class="account-row-arrow">›</div></div>
+      <div class="account-row"><div class="account-row-icon">🪪</div><div class="account-row-label">رخصة القيادة</div><div class="account-row-val">موثقة ✓</div><div class="account-row-arrow">›</div></div>
+      <div class="account-row"><div class="account-row-icon">🧾</div><div class="account-row-label">إيصال الدفع</div><div class="account-row-val">مرفوع ✓</div><div class="account-row-arrow">›</div></div>
+    </div>
+    <div class="account-section-title">النشاط</div>
+    <div class="account-card">
+      <div class="account-row" onclick="goTo('s-prev-chats')"><div class="account-row-icon">💬</div><div class="account-row-label">المحادثات السابقة</div><div class="account-row-val" style="color:var(--emerald-light);font-weight:700">5 محادثات</div><div class="account-row-arrow" style="color:var(--emerald-light)">›</div></div>
+    </div>
+    <div class="account-section-title">الإعدادات</div>
+    <div class="account-card">
+      <div class="account-row"><div class="account-row-icon">🌐</div><div class="account-row-label">اللغة</div><div class="account-row-val">العربية</div><div class="account-row-arrow">›</div></div>
+      <div class="account-row"><div class="account-row-icon">🔔</div><div class="account-row-label">الإشعارات</div><div class="account-row-val">مفعّلة</div><div class="account-row-arrow">›</div></div>
+      <div class="account-row"><div class="account-row-icon">🔒</div><div class="account-row-label">الخصوصية والأمان</div><div class="account-row-val"></div><div class="account-row-arrow">›</div></div>
+    </div>
+    <div class="account-section-title">الدعم</div>
+    <div class="account-card">
+      <div class="account-row"><div class="account-row-icon">💬</div><div class="account-row-label">تواصل مع الدعم</div><div class="account-row-val"></div><div class="account-row-arrow">›</div></div>
+      <div class="account-row"><div class="account-row-icon">📋</div><div class="account-row-label">الشروط والأحكام</div><div class="account-row-val"></div><div class="account-row-arrow">›</div></div>
+      <div class="account-row" onclick="goTo('s-mode')"><div class="account-row-icon">🚪</div><div class="account-row-label" style="color:#c0392b">تسجيل الخروج</div><div class="account-row-val"></div><div class="account-row-arrow">›</div></div>
+    </div>
+  </div>
+  <div class="account-nav">
+    <div class="nav-item active"><div class="nav-icon">👤</div><span>الحساب</span></div>
+    <div class="nav-item" onclick="goTo('s-home')"><div class="nav-icon">🏠</div><span>الرئيسية</span></div>
+    <div class="nav-item" onclick="goTo('s-trips')"><div class="nav-icon">🗺️</div><span>رحلاتي</span></div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: PREVIOUS CHATS ═══ -->
+<div class="screen" id="s-prev-chats" style="background:#f0f4f2">
+  <div style="background:var(--emerald);padding:50px 20px 20px;flex-shrink:0;display:flex;align-items:center;gap:14px">
+    <button onclick="goTo('s-account')" style="background:rgba(255,255,255,.12);border:none;width:40px;height:40px;border-radius:12px;color:var(--sand);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">‹</button>
+    <div>
+      <div style="font-family:'Tajawal',sans-serif;font-size:20px;font-weight:800;color:var(--sand)">المحادثات السابقة</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:2px">سجل تواصلك مع الشركات</div>
+    </div>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:16px 16px 40px">
+
+    <!-- Chat item 1 -->
+    <div class="prev-chat-card" onclick="openPrevChat(0)">
+      <div class="prev-chat-avatar">🏢</div>
+      <div class="prev-chat-info">
+        <div class="prev-chat-name">شركة النقل اليمني</div>
+        <div class="prev-chat-preview">أهلاً! نعم يمكننا الاتفاق. ما هي طاقة شاحنتك؟</div>
+      </div>
+      <div class="prev-chat-meta">
+        <div class="prev-chat-time">10 مايو</div>
+        <div class="prev-chat-badge">2</div>
+      </div>
+    </div>
+
+    <!-- Chat item 2 -->
+    <div class="prev-chat-card" onclick="openPrevChat(1)">
+      <div class="prev-chat-avatar">🚢</div>
+      <div class="prev-chat-info">
+        <div class="prev-chat-name">مجموعة الخليج للشحن</div>
+        <div class="prev-chat-preview">تم الاتفاق، سنرسل لك تفاصيل نقطة الاستلام</div>
+      </div>
+      <div class="prev-chat-meta">
+        <div class="prev-chat-time">7 مايو</div>
+        <div class="prev-chat-unread-dot"></div>
+      </div>
+    </div>
+
+    <!-- Chat item 3 -->
+    <div class="prev-chat-card" onclick="openPrevChat(2)">
+      <div class="prev-chat-avatar">⚡</div>
+      <div class="prev-chat-info">
+        <div class="prev-chat-name">سريع للخدمات اللوجستية</div>
+        <div class="prev-chat-preview">شكراً لك، الرحلة مكتملة بنجاح ✓</div>
+      </div>
+      <div class="prev-chat-meta">
+        <div class="prev-chat-time">4 مايو</div>
+      </div>
+    </div>
+
+    <!-- Chat item 4 -->
+    <div class="prev-chat-card" onclick="openPrevChat(3)">
+      <div class="prev-chat-avatar">🏗️</div>
+      <div class="prev-chat-info">
+        <div class="prev-chat-name">الأمين للنقل الثقيل</div>
+        <div class="prev-chat-preview">سنتواصل معك غداً لتأكيد الموعد</div>
+      </div>
+      <div class="prev-chat-meta">
+        <div class="prev-chat-time">30 أبر</div>
+      </div>
+    </div>
+
+    <!-- Chat item 5 -->
+    <div class="prev-chat-card" onclick="openPrevChat(4)">
+      <div class="prev-chat-avatar">🚀</div>
+      <div class="prev-chat-info">
+        <div class="prev-chat-name">درب إكسبرس</div>
+        <div class="prev-chat-preview">تم الإلغاء، سيتم استرداد المبلغ خلال 24 ساعة</div>
+      </div>
+      <div class="prev-chat-meta">
+        <div class="prev-chat-time">19 أبر</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ SCREEN: PAST TRIPS ═══ -->
+<style>
+#s-trips{background:#f0f4f2;display:none;flex-direction:column}
+#s-trips.active{display:flex}
+.trips-header{background:var(--emerald);padding:50px 20px 24px;flex-shrink:0}
+.trips-title{font-family:'Tajawal',sans-serif;font-size:22px;font-weight:800;color:var(--sand)}
+.trips-subtitle{font-size:12px;color:var(--text-muted);margin-top:4px}
+.trips-stats-row{display:flex;gap:10px;margin-top:16px}
+.trip-stat-pill{flex:1;background:rgba(255,255,255,.1);border-radius:12px;padding:10px 12px;text-align:center}
+.trip-stat-pill-val{font-family:'Tajawal',sans-serif;font-size:20px;font-weight:900;color:var(--sand)}
+.trip-stat-pill-label{font-size:10px;color:var(--text-muted);margin-top:2px}
+.trips-body{flex:1;overflow-y:auto;padding:16px 16px 100px}
+.trip-card{background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;border:1px solid #e0ebe5;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.trip-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.trip-status{font-size:10px;font-weight:700;padding:4px 10px;border-radius:12px}
+.trip-status.completed{background:#e8f7ee;color:#1a6e42}
+.trip-status.cancelled{background:#fde8e8;color:#c0392b}
+.trip-date{font-size:11px;color:#7a9e8e}
+.trip-route-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.trip-city{font-family:'Tajawal',sans-serif;font-size:15px;font-weight:800;color:var(--emerald)}
+.trip-arrow{color:#b0c4bb;font-size:12px}
+.trip-details-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.trip-chip{font-size:11px;background:#f0f7f4;color:#5a8a70;padding:4px 10px;border-radius:10px;font-weight:600}
+.trip-earnings{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid #edf2ef}
+.trip-earn-label{font-size:11px;color:#7a9e8e}
+.trip-earn-val{font-family:'Tajawal',sans-serif;font-size:16px;font-weight:900;color:#1a6e42}
+.trip-company-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.trip-avatar{width:30px;height:30px;border-radius:9px;background:var(--emerald-mid);display:flex;align-items:center;justify-content:center;font-size:14px}
+.trip-company-name{font-size:12px;font-weight:700;color:#1a3325}
+.trips-nav{background:rgba(9,28,18,.97);backdrop-filter:blur(16px);border-top:1px solid rgba(255,255,255,.1);padding:10px 0 24px;display:flex;position:absolute;bottom:0;left:0;right:0;z-index:28}
+.trips-nav .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px;font-size:11px;color:rgba(255,255,255,.4);font-weight:500}
+.trips-nav .nav-item.active{color:var(--orange)}
+.trips-nav .nav-icon{font-size:22px}
+
+/* Account screen */
+#s-account{background:#f0f4f2;display:none;flex-direction:column}
+#s-account.active{display:flex}
+.account-header{background:var(--emerald);padding:50px 20px 32px;flex-shrink:0;text-align:center}
+.account-avatar-lg{width:72px;height:72px;border-radius:22px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px}
+.account-name{font-family:'Tajawal',sans-serif;font-size:20px;font-weight:800;color:var(--sand)}
+.account-badge{font-size:11px;background:rgba(74,184,122,.2);color:#4ab87a;padding:4px 12px;border-radius:12px;display:inline-block;margin-top:6px;font-weight:700}
+.account-body{flex:1;overflow-y:auto;padding:20px 16px 100px}
+.account-section-title{font-size:12px;font-weight:700;color:#7a9e8e;letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;margin-top:18px}
+.account-card{background:#fff;border-radius:16px;border:1px solid #e0ebe5;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.account-row{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid #f0f4f2;cursor:pointer}
+.account-row:last-child{border-bottom:none}
+.account-row-icon{width:36px;height:36px;border-radius:10px;background:#f0f7f4;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.account-row-label{flex:1;font-size:14px;font-weight:600;color:#1a3325}
+.account-row-val{font-size:13px;color:#7a9e8e}
+.account-row-arrow{font-size:16px;color:#c0d4c8}
+.account-nav{background:rgba(9,28,18,.97);backdrop-filter:blur(16px);border-top:1px solid rgba(255,255,255,.1);padding:10px 0 24px;display:flex;position:absolute;bottom:0;left:0;right:0;z-index:28}
+.account-nav .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px;font-size:11px;color:rgba(255,255,255,.4);font-weight:500}
+.account-nav .nav-item.active{color:var(--orange)}
+.account-nav .nav-icon{font-size:22px}
+
+/* Previous Chats */
+.prev-chat-card{background:#fff;border-radius:16px;padding:14px 16px;margin-bottom:10px;border:1px solid #e0ebe5;box-shadow:0 2px 8px rgba(0,0,0,.05);display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.prev-chat-card:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.09)}
+.prev-chat-avatar{width:46px;height:46px;border-radius:14px;background:var(--emerald-mid);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.prev-chat-info{flex:1;min-width:0}
+.prev-chat-name{font-size:14px;font-weight:700;color:#1a3325;margin-bottom:4px}
+.prev-chat-preview{font-size:12px;color:#7a9e8e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prev-chat-meta{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.prev-chat-time{font-size:11px;color:#b0c4bb}
+.prev-chat-badge{width:20px;height:20px;border-radius:50%;background:var(--orange);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.prev-chat-unread-dot{width:8px;height:8px;border-radius:50%;background:var(--emerald-light)}
+</style>
+
+<script>
+/* ═══ DATA ═══ */
+const GIGS = [
+  {
+    id:0, urgent:true,
+    company:'شركة النقل اليمني', companyEn:'Yemen Transport Co.',
+    avatar:'🏢', rating:4.8, trips:342,
+    driver:'أحمد محمد الحداد', driverRating:4.9, driverTrips:187,
+    from:'صنعاء', fromEn:"Sana'a", to:'عدن', toEn:'Aden',
+    fromSub:'مستودع الحصبة', toSub:'ميناء عدن',
+    distKm:325, tripHours:6, pickupKm:2.4,
+    weight:10, weightUnit:'طن', load:'مواد غذائية', loadEn:'Food Items',
+    price:150000, currency:'ر.يـ', badge:'اليوم', badgeEn:'Today',
+    accepted:false, chatUnlocked:false, offers:[]
+  },
+  {
+    id:1, urgent:false,
+    company:'مجموعة الخليج للشحن', companyEn:'Gulf Cargo Group',
+    avatar:'🚢', rating:4.6, trips:201,
+    driver:'خالد علي العمري', driverRating:4.7, driverTrips:95,
+    from:'تعز', fromEn:'Taiz', to:'حضرموت', toEn:'Hadhramaut',
+    fromSub:'منطقة الصناعية', toSub:'مدينة المكلا',
+    distKm:780, tripHours:14, pickupKm:8.1,
+    weight:15, weightUnit:'طن', load:'مواد بناء', loadEn:'Building Materials',
+    price:250000, currency:'ر.يـ', badge:'غداً', badgeEn:'Tomorrow',
+    accepted:false, chatUnlocked:false, offers:[]
+  },
+  {
+    id:2, urgent:true,
+    company:'سريع للخدمات اللوجستية', companyEn:'Sari Logistics',
+    avatar:'⚡', rating:4.9, trips:528,
+    driver:'عمر حسن الشرعبي', driverRating:4.8, driverTrips:243,
+    from:'مأرب', fromEn:"Ma'rib", to:'صنعاء', toEn:"Sana'a",
+    fromSub:'حقل النفط الشمالي', toSub:'مستودع بير أحمد',
+    distKm:173, tripHours:3, pickupKm:5.7,
+    weight:6, weightUnit:'طن', load:'معدات كهربائية', loadEn:'Electrical Equipment',
+    price:120000, currency:'ر.يـ', badge:'اليوم', badgeEn:'Today',
+    accepted:false, chatUnlocked:false, offers:[]
+  },
+  {
+    id:3, urgent:false,
+    company:'الأمين للنقل الثقيل', companyEn:"Al-Amin Heavy Transport",
+    avatar:'🏗️', rating:4.5, trips:119,
+    driver:'سامي ناجي المحوري', driverRating:4.6, driverTrips:72,
+    from:'الحديدة', fromEn:'Hudaydah', to:'إب', toEn:"Ibb",
+    fromSub:'ميناء الحديدة', toSub:'السوق المركزي',
+    distKm:210, tripHours:4, pickupKm:12.3,
+    weight:8, weightUnit:'طن', load:'مواد خام', loadEn:'Raw Materials',
+    price:90000, currency:'ر.يـ', badge:'غداً', badgeEn:'Tomorrow',
+    accepted:false, chatUnlocked:false, offers:[]
+  }
+];
+
+/* ═══ STATE ═══ */
+let lang = 'ar';
+let currentView = 'map';
+let currentGig = null;
+let bargainInput = '';
+const CIRC = 2 * Math.PI * 70;
+let verifyTimer = null;
+let uploadState = {lf:false,lb:false,rc:false};
+
+/* ═══ STRINGS ═══ */
+const S = {
+  ar:{
+    tagSub:'منصة درب اللوجستية', tagline:'نقل بضاعتك بثقة وأمان',
+    companyTitle:'صاحب بضاعة', companyDesc:'ابحث عن شاحنات موثوقة لنقل بضاعتك في أي مكان',
+    driverTitle:'سائق / ناقل', driverDesc:'اعثر على شحنات في طريقك وزد دخلك بكل سهولة',
+    driverBadge:'مميز',
+    footerPre:'بتسجيلك، أنت توافق على ', footerLink:'الشروط والأحكام',
+    regTitle:'تسجيل سائق 🚛', regSub:'أدخل بياناتك لتبدأ العمل فوراً',
+    labelName:'الاسم الكامل', phName:'مثال: أحمد محمد الصنعاني',
+    labelAge:'العمر', phAge:'يجب أن يكون 18 أو أكبر',
+    labelPhone:'رقم الهاتف', phPhone:'+967 7XX XXX XXX',
+    uploadTitle:'📎 المستندات المطلوبة',
+    ulf:'صورة رخصة القيادة (أمامية)', ulb:'صورة رخصة القيادة (خلفية)', urc:'إيصال الدفع (200 ر.يـ)',
+    uHint:'اضغط للرفع • JPG, PNG',
+    submitBtn:'إرسال البيانات للمراجعة ←',
+    vSec:'ثانية', vTitle:'جاري التحقق من بياناتك',
+    vSubtitle:'نراجع مستنداتك للتأكد من صحتها. سيتم تفعيل حسابك خلال لحظات ✨',
+    vstep0:'التحقق من البيانات الشخصية', vstep1:'فحص رخصة القيادة', vstep2:'التحقق من إيصال الدفع',
+    vActive:'جاري...', vWait:'انتظار', vDone:'✓ مكتمل',
+    backArrow:'‹', shpArrow:'⟵', inputAlign:'right', inputFont:"'Cairo',sans-serif",
+    mapView:'خريطة', listView:'قائمة',
+    searchHint:'ابحث عن شحنة أو مسار...',
+    sheetTitle:'شحنات قريبة منك', sheetCount:'شحنات متاحة الآن',
+    tripHours:'ساعة', distKm:'كم من موقعك', pickupAway:'كم (نقطة الاستلام)',
+    tons:'طن', load:'الحمولة',
+    bargainBtn:'💰 عرض سعر', bargainTitle:'قدّم عرضك',
+    bargainCurrentLabel:'السعر المطلوب:', bargainPlaceholder:'أدخل عرضك بالريال...',
+    bargainSend:'إرسال العرض', bargainHint:'سيتم إرسال عرضك للشركة للمراجعة. لا تتم مشاركة معلوماتك الشخصية.',
+    offerPending:'قيد المراجعة', offerAccepted:'مقبول ✓', offerDeclined:'مرفوض',
+    acceptBtn:'✓ قبول الشحنة', acceptedBtn:'✓ تم القبول', 
+    chatLocked:'💬 فتح المحادثة (بعد القبول)', chatUnlocked:'💬 بدء المحادثة',
+    noContact:'🔒 لا تتم مشاركة بيانات الاتصال بين الأطراف',
+    driverLabel:'الـسائـق', companyLabel:'الشركة', routeLabel:'المسار',
+    tripInfoLabel:'تفاصيل الرحلة', bargainLabel:'تفاوض على السعر',
+    ratingLabel:'التقييم', tripsLabel:'رحلة منجزة',
+    verified:'موثق ✓', privacyNote:'لن يتم مشاركة بيانات الاتصال بين الطرفين',
+    navAcc:'الحساب', navMsg:'الرسائل', navTrips:'رحلاتي', navHome:'الرئيسية',
+    listTitle:'الشحنات المتاحة', listSub:'مرتبة حسب القرب منك',
+    fromYou:'من موقعك',
+  },
+  en:{
+    tagSub:'DARB LOGISTICS PLATFORM', tagline:'Transport your goods with trust & safety',
+    companyTitle:'Cargo Owner', companyDesc:'Find trusted trucks to ship your goods anywhere',
+    driverTitle:'Driver / Carrier', driverDesc:'Find shipments on your route and boost your income',
+    driverBadge:'Featured',
+    footerPre:'By signing up, you agree to our ', footerLink:'Terms & Conditions',
+    regTitle:'Driver Registration 🚛', regSub:'Enter your details to start working right away',
+    labelName:'Full Name', phName:'e.g. Ahmed Mohammed Al-Sanani',
+    labelAge:'Age', phAge:'Must be 18 or older',
+    labelPhone:'Phone Number', phPhone:'+967 7XX XXX XXX',
+    uploadTitle:'📎 Required Documents',
+    ulf:"Driver's License (Front)", ulb:"Driver's License (Back)", urc:'Payment Receipt (200 YER)',
+    uHint:'Tap to upload • JPG, PNG',
+    submitBtn:'Submit for Review →',
+    vSec:'seconds', vTitle:'Verifying your details',
+    vSubtitle:"We're reviewing your documents. Your account will be activated shortly ✨",
+    vstep0:'Verifying personal info', vstep1:"Checking driver's license", vstep2:'Verifying payment receipt',
+    vActive:'In progress...', vWait:'Waiting', vDone:'✓ Done',
+    backArrow:'›', shpArrow:'⟶', inputAlign:'left', inputFont:"'Plus Jakarta Sans',sans-serif",
+    mapView:'Map', listView:'List',
+    searchHint:'Search for a shipment or route...',
+    sheetTitle:'Nearby Shipments', sheetCount:'Available now',
+    tripHours:'hrs trip', distKm:'km from you', pickupAway:'km (pickup)',
+    tons:'tons', load:'Cargo',
+    bargainBtn:'💰 Make Offer', bargainTitle:'Submit Your Offer',
+    bargainCurrentLabel:'Listed price:', bargainPlaceholder:'Enter your offer in YER...',
+    bargainSend:'Send Offer', bargainHint:'Your offer will be sent to the company. No personal info is shared.',
+    offerPending:'Pending', offerAccepted:'Accepted ✓', offerDeclined:'Declined',
+    acceptBtn:'✓ Accept Shipment', acceptedBtn:'✓ Accepted',
+    chatLocked:'💬 Open Chat (accept first)', chatUnlocked:'💬 Start Chat',
+    noContact:'🔒 No contact details are shared between parties',
+    driverLabel:'DRIVER', companyLabel:'COMPANY', routeLabel:'ROUTE',
+    tripInfoLabel:'TRIP DETAILS', bargainLabel:'NEGOTIATE PRICE',
+    ratingLabel:'Rating', tripsLabel:'trips completed',
+    verified:'Verified ✓', privacyNote:'No contact details are shared between parties',
+    navAcc:'Account', navMsg:'Messages', navTrips:'My Trips', navHome:'Home',
+    listTitle:'Available Shipments', listSub:'Sorted by distance from you',
+    fromYou:'from you',
+  }
+};
+function tx(k){ return S[lang][k] || ''; }
+
+/* ═══ LANG ═══ */
+function setLang(l) {
+  lang = l;
+  document.documentElement.setAttribute('lang', l);
+  document.documentElement.setAttribute('dir', l==='ar'?'rtl':'ltr');
+
+  const map = {
+    't-tagSub':'tagSub','t-tagline':'tagline',
+    't-companyTitle':'companyTitle','t-companyDesc':'companyDesc',
+    't-driverTitle':'driverTitle','t-driverDesc':'driverDesc',
+    't-regTitle':'regTitle','t-regSub':'regSub',
+    't-labelName':'labelName','t-labelAge':'labelAge','t-labelPhone':'labelPhone',
+    't-uploadTitle':'uploadTitle','t-ulf':'ulf','t-ulb':'ulb','t-urc':'urc',
+    't-uploadHint1':'uHint','t-uploadHint2':'uHint','t-uploadHint3':'uHint',
+    'submit-btn':'submitBtn','t-vSec':'vSec','t-vTitle':'vTitle','t-vSubtitle':'vSubtitle',
+    't-vstep0':'vstep0','t-vstep1':'vstep1','t-vstep2':'vstep2',
+    't-mapView':'mapView','t-listView':'listView',
+    't-searchHint':'searchHint','t-sheetTitle':'sheetTitle','t-sheetCount':'sheetCount',
+    't-navAcc':'navAcc','t-navMsg':'navMsg','t-navTrips':'navTrips','t-navHome':'navHome',
+    't-privacyNote':'privacyNote',
+  };
+  Object.entries(map).forEach(([id,key])=>{
+    const el = document.getElementById(id);
+    if(el) el.textContent = tx(key);
+  });
+  document.getElementById('back-btn').textContent = tx('backArrow');
+  const badge = document.getElementById('driver-badge');
+  badge.textContent = tx('driverBadge');
+  badge.style.right = '14px';
+  badge.style.left = 'auto';
+  ['f-name','f-age','f-phone'].forEach(id=>{
+    const inp = document.getElementById(id);
+    if(inp){ inp.style.textAlign=tx('inputAlign'); inp.style.fontFamily=tx('inputFont'); }
+  });
+  document.getElementById('f-name').placeholder = tx('phName');
+  document.getElementById('f-age').placeholder = tx('phAge');
+  document.getElementById('f-phone').placeholder = tx('phPhone');
+  renderCards();
+}
+
+/* ═══ NAVIGATION ═══ */
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active','screen-enter'));
+  document.getElementById(id).classList.add('active','screen-enter');
+  if(id==='s-verify') startVerify();
+  if(id==='s-home') { renderCards(); updateHomeNav(); }
+  if(id==='s-trips') { renderTrips(); }
+}
+
+function updateHomeNav(){
+  ['nav-account','nav-home','nav-trips'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.classList.remove('active');
+  });
+  document.getElementById('nav-home').classList.add('active');
+}
+
+/* ═══ VIEW TOGGLE ═══ */
+function setView(view) {
+  currentView = view;
+  document.getElementById('btn-map-view').classList.toggle('active', view==='map');
+  document.getElementById('btn-list-view').classList.toggle('active', view==='list');
+  const listPanel = document.getElementById('list-view-panel');
+  const mapSheet = document.getElementById('map-bottom-sheet');
+  const mapCanvas = document.getElementById('map-canvas');
+  if(view==='list'){
+    listPanel.classList.add('visible');
+    mapSheet.style.display='none';
+    mapCanvas.style.opacity='0.3';
+  } else {
+    listPanel.classList.remove('visible');
+    mapSheet.style.display='';
+    mapCanvas.style.opacity='1';
+  }
+}
+
+/* ═══ RENDER CARDS ═══ */
+function renderCards() {
+  renderSheetCards();
+  renderListCards();
+}
+
+function gigCompanyName(g){ return lang==='ar' ? g.company : g.companyEn; }
+function gigFrom(g){ return lang==='ar' ? g.from : g.fromEn; }
+function gigTo(g){ return lang==='ar' ? g.to : g.toEn; }
+function gigLoad(g){ return lang==='ar' ? g.load : g.loadEn; }
+function gigBadge(g){ return lang==='ar' ? g.badge : g.badgeEn; }
+
+function renderSheetCards(){
+  const container = document.getElementById('sheet-scroll');
+  container.innerHTML = GIGS.map(g => `
+    <div class="gig-card-h ${g.urgent?'urgent':''}" id="hcard-${g.id}" onclick="openGig(${g.id})">
+      <div class="gig-company-row">
+        <div class="gig-avatar">${g.avatar}</div>
+        <div>
+          <div class="gig-company-name">${gigCompanyName(g)}</div>
+          <div style="display:flex;gap:6px;align-items:center;margin-top:2px">
+            <span class="gig-rating-badge">⭐ ${g.rating}</span>
+            <span class="gig-trips-badge">${g.trips} ${tx('tripsLabel')}</span>
+          </div>
+        </div>
+      </div>
+      <div class="gig-route">
+        <span class="gig-city">${gigFrom(g)}</span>
+        <span class="gig-arrow">${tx('shpArrow')}</span>
+        <span class="gig-city">${gigTo(g)}</span>
+      </div>
+      <div class="gig-badges-row">
+        <span class="gig-badge-chip ${g.urgent?'urgent-chip':''}">${gigBadge(g)}</span>
+        <span class="gig-badge-chip">${gigLoad(g)}</span>
+      </div>
+      <div class="gig-stats">
+        <div class="gig-stat-item">
+          <div class="gig-stat-val">⏱ ${g.tripHours}</div>
+          <div class="gig-stat-label">${tx('tripHours')}</div>
+        </div>
+        <div class="gig-stat-item">
+          <div class="gig-stat-val">📍 ${g.pickupKm}</div>
+          <div class="gig-stat-label">${tx('pickupAway')}</div>
+        </div>
+      </div>
+      <div class="gig-price-row">
+        <div>
+          <div class="gig-price">${g.price.toLocaleString()} ${g.currency}</div>
+          <div class="gig-price-label">${g.weight} ${tx('tons')} • ${g.distKm} ${tx('distKm')}</div>
+        </div>
+        <button class="bargain-btn" onclick="event.stopPropagation();openGig(${g.id},true)">${tx('bargainBtn')}</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderListCards(){
+  const container = document.getElementById('list-items');
+  container.innerHTML = GIGS.map(g => `
+    <div class="gig-card-v" onclick="openGig(${g.id})">
+      <div class="gig-company-row">
+        <div class="gig-avatar">${g.avatar}</div>
+        <div style="flex:1">
+          <div class="gig-company-name" style="color:#1a3325">${gigCompanyName(g)}</div>
+          <div style="display:flex;gap:8px;margin-top:3px">
+            <span class="gig-rating-badge" style="color:#d97706">⭐ ${g.rating}</span>
+            <span class="gig-trips-badge">${g.trips} ${tx('tripsLabel')}</span>
+          </div>
+        </div>
+        <span class="gig-badge-chip ${g.urgent?'urgent-chip':''}" style="align-self:flex-start">${gigBadge(g)}</span>
+      </div>
+      <div class="gig-distance-row">
+        <span>📍</span> <strong>${g.pickupKm} كم</strong> ${tx('fromYou')} • ⏱ ${g.tripHours} ${tx('tripHours')}
+      </div>
+      <div class="gig-route">
+        <span class="gig-city" style="color:var(--emerald)">${gigFrom(g)}</span>
+        <span class="gig-arrow" style="color:#b0c4bb">${tx('shpArrow')}</span>
+        <span class="gig-city" style="color:var(--emerald)">${gigTo(g)}</span>
+      </div>
+      <div class="gig-badges-row">
+        <span class="gig-badge-chip" style="background:#f0f7f4;color:#5a8a70">🏋️ ${g.weight} ${tx('tons')}</span>
+        <span class="gig-badge-chip" style="background:#f0f7f4;color:#5a8a70">📏 ${g.distKm} كم</span>
+        <span class="gig-badge-chip" style="background:#f0f7f4;color:#5a8a70">${gigLoad(g)}</span>
+      </div>
+      <div class="v-divider"></div>
+      <div class="gig-price-row">
+        <div>
+          <div class="gig-price" style="color:#1a6e42">${g.price.toLocaleString()} ${g.currency}</div>
+        </div>
+        <button class="view-details-btn" onclick="event.stopPropagation();openGig(${g.id})">${lang==='ar'?'عرض التفاصيل':'View Details'} →</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ═══ GIG MODAL ═══ */
+function openGig(id, bargainFocus=false) {
+  currentGig = GIGS.find(g=>g.id===id);
+  const g = currentGig;
+  // highlight marker
+  document.querySelectorAll('.map-marker').forEach(m=>m.classList.remove('active'));
+  const m = document.getElementById('marker-'+id);
+  if(m) m.classList.add('active');
+
+  const driverName = lang==='ar' ? g.driver : g.driver; // keep Arabic name
+  const offersHtml = g.offers.length ? g.offers.map(o=>`
+    <div class="bargain-offer-item">
+      <div class="offer-val">${o.val.toLocaleString()} ${g.currency}</div>
+      <div class="offer-status ${o.status}">${o.status==='pending'?tx('offerPending'):o.status==='accepted'?tx('offerAccepted'):tx('offerDeclined')}</div>
+    </div>
+  `).join('') : '';
+
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-section">
+      <div class="modal-label">${tx('companyLabel')} + ${tx('driverLabel')}</div>
+      <div class="driver-profile">
+        <div class="driver-avatar">${g.avatar}</div>
+        <div class="driver-info">
+          <div class="driver-name">${gigCompanyName(g)}</div>
+          <div class="driver-company">🚛 ${driverName}</div>
+          <div class="driver-stats-mini">
+            <span class="driver-stat">⭐ <strong>${g.rating}</strong></span>
+            <span class="driver-stat">🛣️ <strong>${g.trips}</strong> ${tx('tripsLabel')}</span>
+          </div>
+        </div>
+        <div class="driver-verified">${tx('verified')}</div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-label">${tx('routeLabel')}</div>
+      <div class="route-visual">
+        <div class="route-point">
+          <div class="route-dot origin"></div>
+          <div>
+            <div class="route-city-name">${gigFrom(g)}</div>
+            <div class="route-city-sub">${g.fromSub}</div>
+          </div>
+        </div>
+        <div class="route-line"></div>
+        <div class="route-point">
+          <div class="route-dot dest"></div>
+          <div>
+            <div class="route-city-name">${gigTo(g)}</div>
+            <div class="route-city-sub">${g.toSub}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-label">${tx('tripInfoLabel')}</div>
+      <div class="info-grid">
+        <div class="info-cell">
+          <div class="info-cell-icon">⏱️</div>
+          <div class="info-cell-val">${g.tripHours} ${lang==='ar'?'ساعة':'hrs'}</div>
+          <div class="info-cell-label">${lang==='ar'?'مدة الرحلة':'Trip Duration'}</div>
+        </div>
+        <div class="info-cell">
+          <div class="info-cell-icon">📍</div>
+          <div class="info-cell-val">${g.pickupKm} كم</div>
+          <div class="info-cell-label">${lang==='ar'?'نقطة الاستلام من موقعك':'Pickup from you'}</div>
+        </div>
+        <div class="info-cell">
+          <div class="info-cell-icon">🏋️</div>
+          <div class="info-cell-val">${g.weight} ${tx('tons')}</div>
+          <div class="info-cell-label">${lang==='ar'?'وزن الحمولة':'Cargo Weight'}</div>
+        </div>
+        <div class="info-cell">
+          <div class="info-cell-icon">📏</div>
+          <div class="info-cell-val">${g.distKm} كم</div>
+          <div class="info-cell-label">${lang==='ar'?'إجمالي المسافة':'Total Distance'}</div>
+        </div>
+        <div class="info-cell" style="grid-column:span 2">
+          <div class="info-cell-icon">📦</div>
+          <div class="info-cell-val" style="font-size:14px">${gigLoad(g)}</div>
+          <div class="info-cell-label">${lang==='ar'?'نوع الحمولة':'Cargo Type'}</div>
+        </div>
+        <div class="info-cell highlight" style="grid-column:span 2">
+          <div class="info-cell-icon">💵</div>
+          <div class="info-cell-val">${g.price.toLocaleString()} ${g.currency}</div>
+          <div class="info-cell-label">${lang==='ar'?'السعر المطلوب':'Listed Price'}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-label">${tx('bargainLabel')}</div>
+      <div class="bargain-panel">
+        <div class="bargain-current">${tx('bargainCurrentLabel')} <strong>${g.price.toLocaleString()} ${g.currency}</strong></div>
+        <div class="bargain-input-row">
+          <input class="bargain-input" id="bargain-val" type="number" placeholder="${tx('bargainPlaceholder')}" style="font-family:'Tajawal',sans-serif">
+          <button class="bargain-send" onclick="submitOffer(${g.id})">${tx('bargainSend')}</button>
+        </div>
+        <div class="bargain-hint">${tx('bargainHint')}</div>
+        ${offersHtml ? `<div class="bargain-offers">${offersHtml}</div>` : ''}
+      </div>
+    </div>
+
+    <div class="modal-section modal-actions" id="modal-actions-${g.id}">
+      <div class="scroll-gate-notice" id="scroll-notice-${g.id}">📖 ${lang==='ar'?'اقرأ كامل التفاصيل أولاً لتتمكن من تقديم عرض أو القبول':'Read all details first to make an offer or accept'}</div>
+      <button class="accept-btn ${g.accepted?'accepted':''}" id="accept-btn-${g.id}" onclick="acceptGig(${g.id})" style="display:none">
+        ${g.accepted ? tx('acceptedBtn') : tx('acceptBtn')}
+      </button>
+      <button class="chat-btn ${g.chatUnlocked?'unlocked':''}" id="chat-btn-${g.id}" onclick="openChat(${g.id})" style="display:none">
+        <span class="chat-lock">${g.chatUnlocked?'💬':'🔒'}</span>
+        ${g.chatUnlocked ? tx('chatUnlocked') : tx('chatLocked')}
+      </button>
+      <div class="no-contact-note" id="contact-note-${g.id}" style="display:none">${tx('noContact')}</div>
+    </div>
+  `;
+
+  const modal = document.getElementById('gig-modal');
+  modal.classList.add('open');
+
+  // Scroll gate — reveal offer/accept only after user scrolls to bottom
+  const sheet = document.getElementById('gig-modal-sheet');
+  const unlockActions = () => {
+    const notice = document.getElementById('scroll-notice-'+g.id);
+    const acceptBtn = document.getElementById('accept-btn-'+g.id);
+    const chatBtn = document.getElementById('chat-btn-'+g.id);
+    const contactNote = document.getElementById('contact-note-'+g.id);
+    if(notice) notice.style.display = 'none';
+    if(acceptBtn) acceptBtn.style.display = 'flex';
+    if(chatBtn) chatBtn.style.display = 'flex';
+    if(contactNote) contactNote.style.display = 'flex';
+    sheet.removeEventListener('scroll', scrollCheck);
+  };
+  const scrollCheck = () => {
+    if(sheet.scrollTop + sheet.clientHeight >= sheet.scrollHeight - 60) unlockActions();
+  };
+  setTimeout(() => sheet.addEventListener('scroll', scrollCheck), 400);
+
+  if(bargainFocus){
+    setTimeout(()=>{
+      const inp = document.getElementById('bargain-val');
+      if(inp) inp.focus();
+      document.getElementById('gig-modal-sheet').scrollTo({top:600,behavior:'smooth'});
+    },300);
+  }
+}
+
+function closeGig(){
+  document.getElementById('gig-modal').classList.remove('open');
+  document.querySelectorAll('.map-marker').forEach(m=>m.classList.remove('active'));
+  currentGig = null;
+}
+
+function acceptGig(id){
+  const g = GIGS.find(g=>g.id===id);
+  g.accepted = true;
+  g.chatUnlocked = true;
+  const btn = document.getElementById('accept-btn-'+id);
+  if(btn){ btn.classList.add('accepted'); btn.textContent = tx('acceptedBtn'); }
+  const chatBtn = document.getElementById('chat-btn-'+id);
+  if(chatBtn){
+    chatBtn.classList.add('unlocked');
+    chatBtn.innerHTML = `<span class="chat-lock">💬</span> ${tx('chatUnlocked')}`;
+  }
+}
+
+function submitOffer(id){
+  const g = GIGS.find(g=>g.id===id);
+  const inp = document.getElementById('bargain-val');
+  const val = parseInt(inp.value);
+  if(!val || val < 10000) { inp.style.borderColor='var(--orange)'; return; }
+  g.offers.push({val, status:'pending'});
+  inp.value = '';
+  inp.style.borderColor = '';
+  // simulate response after 2s
+  setTimeout(()=>{
+    const offer = g.offers[g.offers.length-1];
+    offer.status = val >= g.price * 0.85 ? 'accepted' : 'declined';
+    if(currentGig && currentGig.id===id) openGig(id);
+  }, 2000);
+  openGig(id);
+}
+
+function openChat(id){
+  const g = GIGS.find(g=>g.id===id);
+  if(!g || !g.chatUnlocked) return;
+  // set header
+  document.getElementById('chat-company-name').textContent = gigCompanyName(g);
+  document.getElementById('chat-avatar-icon').textContent = g.avatar;
+  document.getElementById('chat-status-line').innerHTML = '🟢 متصل الآن';
+  document.getElementById('t-privacyNote').textContent = tx('privacyNote');
+  // show input row
+  document.getElementById('chat-input-row').style.display = 'flex';
+  // seed messages
+  const container = document.getElementById('chat-messages');
+  container.innerHTML = `
+    <div class="chat-msg sent"><div class="chat-bubble">مرحباً، أنا مهتم بالشحنة. هل يمكننا الاتفاق؟</div><div class="chat-time">الآن</div></div>
+    <div class="chat-msg recv"><div class="chat-bubble">أهلاً! نعم يمكننا الاتفاق. ما هي طاقة شاحنتك؟</div><div class="chat-time">الآن</div></div>
+  `;
+  // set back button to return to home
+  document.getElementById('chat-back-btn').onclick = () => goTo('s-home');
+  closeGig();
+  goTo('s-chat');
+  setTimeout(() => { container.scrollTop = container.scrollHeight; }, 100);
+}
+
+function sendChat(){
+  const inp = document.getElementById('chat-input-field');
+  const msg = inp.value.trim();
+  if(!msg) return;
+  inp.value = '';
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg sent';
+  div.innerHTML = `<div class="chat-bubble">${msg}</div><div class="chat-time">${new Date().toLocaleTimeString(lang==='ar'?'ar-YE':'en-US',{hour:'2-digit',minute:'2-digit'})}</div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+/* ═══ FORM / VERIFY ═══ */
+function handleUpload(input, cardId, iconId, key) {
+  if(!input.files || !input.files[0]) return;
+  document.getElementById(cardId).classList.add('uploaded');
+  document.getElementById(iconId).textContent = '✅';
+  document.getElementById('chk-'+key).style.display = 'flex';
+  uploadState[key] = true;
+  checkForm();
+}
+
+function checkForm() {
+  const name = document.getElementById('f-name').value.trim();
+  const age = parseInt(document.getElementById('f-age').value);
+  const phone = document.getElementById('f-phone').value.trim();
+  const ok = name.length > 2 && age >= 18 && age <= 70 && phone.length >= 8 && uploadState.lf && uploadState.lb && uploadState.rc;
+  document.getElementById('submit-btn').classList.toggle('ready', ok);
+}
+
+function submitForm() { goTo('s-verify'); }
+
+function startVerify() {
+  clearInterval(verifyTimer);
+  const ring = document.getElementById('prog-ring');
+  const countEl = document.getElementById('v-count');
+  let t = 10;
+  ring.style.strokeDashoffset = CIRC;
+  [0,1,2].forEach(i => {
+    document.getElementById('vstep'+i).classList.remove('done');
+    document.getElementById('vstatus'+i).textContent = i===0 ? tx('vActive') : tx('vWait');
+    document.getElementById('vd'+i).classList.toggle('active', i===0);
+  });
+  const stepTimes=[7,4,1], dotTimes=[10,6,3], done=[false,false,false];
+  verifyTimer = setInterval(()=>{
+    t--;
+    countEl.textContent = t;
+    ring.style.strokeDashoffset = CIRC * (t/10);
+    dotTimes.forEach((dt,i)=>{ if(t<=dt) document.getElementById('vd'+i).classList.add('active'); });
+    stepTimes.forEach((st,i)=>{
+      if(t<=st && !done[i]){
+        done[i]=true;
+        document.getElementById('vstep'+i).classList.add('done');
+        document.getElementById('vstatus'+i).textContent = tx('vDone');
+        if(i<2) document.getElementById('vstatus'+(i+1)).textContent = tx('vActive');
+      }
+    });
+    if(t<=0){ clearInterval(verifyTimer); ring.style.strokeDashoffset=0; setTimeout(()=>goTo('s-home'),600); }
+  },1000);
+}
+
+// close modal on overlay click
+document.getElementById('gig-modal').addEventListener('click', function(e){
+  if(e.target === this) closeGig();
+});
+
+/* ═══ PAST TRIPS DATA & RENDER ═══ */
+const TRIPS = [
+  { id:'T001', status:'completed', date:'10 مايو 2026', from:'صنعاء', to:'عدن', company:'شركة النقل اليمني', avatar:'🏢', distKm:325, weight:10, load:'مواد غذائية', earn:150000, currency:'ر.يـ', rating:5 },
+  { id:'T002', status:'completed', date:'7 مايو 2026', from:'تعز', to:'حضرموت', company:'مجموعة الخليج للشحن', avatar:'🚢', distKm:780, weight:15, load:'مواد بناء', earn:250000, currency:'ر.يـ', rating:5 },
+  { id:'T003', status:'cancelled', date:'4 مايو 2026', from:'مأرب', to:'صنعاء', company:'سريع للخدمات', avatar:'⚡', distKm:173, weight:6, load:'معدات كهربائية', earn:0, currency:'ر.يـ', rating:null },
+  { id:'T004', status:'completed', date:'30 أبريل 2026', from:'الحديدة', to:'إب', company:'الأمين للنقل', avatar:'🏗️', distKm:210, weight:8, load:'مواد خام', earn:90000, currency:'ر.يـ', rating:4 },
+  { id:'T005', status:'completed', date:'25 أبريل 2026', from:'عدن', to:'صنعاء', company:'شركة النقل اليمني', avatar:'🏢', distKm:325, weight:12, load:'بضاعة متنوعة', earn:180000, currency:'ر.يـ', rating:5 },
+  { id:'T006', status:'completed', date:'19 أبريل 2026', from:'صنعاء', to:'تعز', company:'درب إكسبرس', avatar:'🚀', distKm:256, weight:9, load:'إلكترونيات', earn:140000, currency:'ر.يـ', rating:5 },
+  { id:'T007', status:'completed', date:'12 أبريل 2026', from:'إب', to:'الحديدة', company:'مجموعة الخليج', avatar:'🚢', distKm:190, weight:7, load:'مواد غذائية', earn:95000, currency:'ر.يـ', rating:4 },
+  { id:'T008', status:'completed', date:'5 أبريل 2026', from:'حضرموت', to:'صنعاء', company:'النقل الوطني', avatar:'🏛️', distKm:1100, weight:20, load:'آلات ثقيلة', earn:420000, currency:'ر.يـ', rating:5 },
+];
+
+function renderTrips(){
+  const container = document.getElementById('trips-body');
+  if(!container) return;
+  container.innerHTML = TRIPS.map(t => `
+    <div class="trip-card">
+      <div class="trip-card-top">
+        <div class="trip-company-row">
+          <div class="trip-avatar">${t.avatar}</div>
+          <div class="trip-company-name">${t.company}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <span class="trip-status ${t.status}">${t.status==='completed'?'✓ مكتملة':'✕ ملغاة'}</span>
+          <span class="trip-date">${t.date}</span>
+        </div>
+      </div>
+      <div class="trip-route-row">
+        <span class="trip-city">${t.from}</span>
+        <span class="trip-arrow">⟵</span>
+        <span class="trip-city">${t.to}</span>
+      </div>
+      <div class="trip-details-row">
+        <span class="trip-chip">📏 ${t.distKm} كم</span>
+        <span class="trip-chip">🏋️ ${t.weight} طن</span>
+        <span class="trip-chip">📦 ${t.load}</span>
+        ${t.rating ? `<span class="trip-chip">⭐ ${t.rating}/5</span>` : ''}
+      </div>
+      <div class="trip-earnings">
+        <span class="trip-earn-label">${t.status==='completed'?'الأرباح':'—'}</span>
+        <span class="trip-earn-val">${t.status==='completed' ? t.earn.toLocaleString()+' '+t.currency : 'لا توجد أرباح'}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// boot — Arabic only, no toggle
+setLang('ar');
+renderTrips();
+
+/* ═══ MAP PAN & ZOOM ═══ */
+const mapState = {
+  scale: 1,
+  offsetX: 0,
+  offsetY: 0,
+  isDragging: false,
+  dragStartX: 0,
+  dragStartY: 0,
+  dragStartOffsetX: 0,
+  dragStartOffsetY: 0
+};
+
+const mapCanvas = document.getElementById('map-canvas');
+const mapWorld = document.getElementById('map-world');
+
+function updateMapTransform() {
+  mapWorld.style.transform = `translate(${mapState.offsetX}px, ${mapState.offsetY}px) scale(${mapState.scale})`;
+}
+
+function mapZoom(factor) {
+  const oldScale = mapState.scale;
+  mapState.scale = Math.max(0.5, Math.min(3, mapState.scale * factor));
+  
+  // Zoom towards center of canvas
+  const centerX = mapCanvas.clientWidth / 2;
+  const centerY = mapCanvas.clientHeight / 2;
+  
+  mapState.offsetX = centerX - (centerX - mapState.offsetX) * (mapState.scale / oldScale);
+  mapState.offsetY = centerY - (centerY - mapState.offsetY) * (mapState.scale / oldScale);
+  
+  updateMapTransform();
+}
+
+function mapReset() {
+  mapState.scale = 1;
+  mapState.offsetX = 0;
+  mapState.offsetY = 0;
+  updateMapTransform();
+}
+
+// Mouse drag events
+mapCanvas.addEventListener('mousedown', (e) => {
+  mapState.isDragging = true;
+  mapState.dragStartX = e.clientX;
+  mapState.dragStartY = e.clientY;
+  mapState.dragStartOffsetX = mapState.offsetX;
+  mapState.dragStartOffsetY = mapState.offsetY;
+  mapCanvas.style.cursor = 'grabbing';
+  e.preventDefault();
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (!mapState.isDragging) return;
+  const deltaX = e.clientX - mapState.dragStartX;
+  const deltaY = e.clientY - mapState.dragStartY;
+  mapState.offsetX = mapState.dragStartOffsetX + deltaX;
+  mapState.offsetY = mapState.dragStartOffsetY + deltaY;
+  updateMapTransform();
+});
+
+document.addEventListener('mouseup', () => {
+  if (mapState.isDragging) {
+    mapState.isDragging = false;
+    mapCanvas.style.cursor = 'grab';
+  }
+});
+
+// Touch events for mobile
+mapCanvas.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 1) {
+    mapState.isDragging = true;
+    mapState.dragStartX = e.touches[0].clientX;
+    mapState.dragStartY = e.touches[0].clientY;
+    mapState.dragStartOffsetX = mapState.offsetX;
+    mapState.dragStartOffsetY = mapState.offsetY;
+  }
+});
+
+mapCanvas.addEventListener('touchmove', (e) => {
+  if (!mapState.isDragging || e.touches.length !== 1) return;
+  const deltaX = e.touches[0].clientX - mapState.dragStartX;
+  const deltaY = e.touches[0].clientY - mapState.dragStartY;
+  mapState.offsetX = mapState.dragStartOffsetX + deltaX;
+  mapState.offsetY = mapState.dragStartOffsetY + deltaY;
+  updateMapTransform();
+  e.preventDefault();
+});
+
+mapCanvas.addEventListener('touchend', () => {
+  mapState.isDragging = false;
+});
+
+// Wheel zoom
+mapCanvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const factor = e.deltaY > 0 ? 0.9 : 1.1;
+  mapZoom(factor);
+});
+
+
+function openPrevChat(idx) {
+  const PREV_CHATS = [
+    { name:'شركة النقل اليمني', avatar:'🏢', msgs:[
+      {sent:true, text:'مرحباً، أنا مهتم بشحنة صنعاء – عدن. هل الوزن قابل للتعديل؟', time:'9:42 ص'},
+      {sent:false, text:'أهلاً! نعم يمكننا الاتفاق. ما هي طاقة شاحنتك؟', time:'9:43 ص'},
+      {sent:true, text:'شاحنتي 12 طن، هل يناسبك ذلك؟', time:'9:45 ص'},
+      {sent:false, text:'ممتاز، الموعد غداً الساعة 7 صباحاً من مستودع الحصبة', time:'9:47 ص'},
+    ]},
+    { name:'مجموعة الخليج للشحن', avatar:'🚢', msgs:[
+      {sent:true, text:'هل الشحنة لا تزال متاحة؟', time:'2:10 م'},
+      {sent:false, text:'نعم، الشحنة متاحة', time:'2:12 م'},
+      {sent:false, text:'تم الاتفاق، سنرسل لك تفاصيل نقطة الاستلام', time:'2:15 م'},
+    ]},
+    { name:'سريع للخدمات اللوجستية', avatar:'⚡', msgs:[
+      {sent:true, text:'وصلت بسلامة إلى عدن', time:'6:30 م'},
+      {sent:false, text:'ممتاز! شكراً لك على الدقة في التسليم', time:'6:35 م'},
+      {sent:false, text:'شكراً لك، الرحلة مكتملة بنجاح ✓', time:'6:36 م'},
+    ]},
+    { name:'الأمين للنقل الثقيل', avatar:'🏗️', msgs:[
+      {sent:true, text:'متى موعد التحميل بالضبط؟', time:'11:00 ص'},
+      {sent:false, text:'سنتواصل معك غداً لتأكيد الموعد', time:'11:15 ص'},
+    ]},
+    { name:'درب إكسبرس', avatar:'🚀', msgs:[
+      {sent:false, text:'نأسف، اضطررنا لإلغاء الشحنة', time:'8:00 ص'},
+      {sent:true, text:'حسناً، هل سيتم استرداد المبلغ؟', time:'8:05 ص'},
+      {sent:false, text:'تم الإلغاء، سيتم استرداد المبلغ خلال 24 ساعة', time:'8:07 ص'},
+    ]},
+  ];
+  const c = PREV_CHATS[idx];
+
+  // Set back button to return to prev chats list
+  document.getElementById('chat-back-btn').onclick = () => goTo('s-prev-chats');
+
+  // Set all content immediately before navigation
+  document.getElementById('chat-company-name').textContent = c.name;
+  document.getElementById('chat-avatar-icon').textContent = c.avatar;
+  document.getElementById('chat-status-line').innerHTML = '🕐 محادثة سابقة';
+  document.getElementById('t-privacyNote').textContent = 'سجل المحادثة — للاطلاع فقط';
+  document.getElementById('chat-input-row').style.display = 'none';
+
+  // Build message HTML before navigation
+  const messageHTML = c.msgs.map(m => `
+    <div class="chat-msg ${m.sent ? 'sent' : 'recv'}">
+      <div class="chat-bubble">${m.text}</div>
+      <div class="chat-time">${m.time}</div>
+    </div>
+  `).join('');
+
+  // Navigate
+  goTo('s-chat');
+
+  // Populate messages and scroll after navigation renders
+  requestAnimationFrame(() => {
+    const container = document.getElementById('chat-messages');
+    container.innerHTML = messageHTML;
+    // Scroll in next frame after content renders
+    requestAnimationFrame(() => {
+      container.scrollTop = container.scrollHeight;
+    });
+  });
+}
+</script>
+</body>
+</html>
